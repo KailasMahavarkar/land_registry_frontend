@@ -1,0 +1,44 @@
+{
+	"name": "vite-project",
+	"private": true,
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"dev": "vite --port 3000",
+		"build": "tsc && vite build",
+		"preview": "vite preview",
+		"sass": "sass ./src/styles/main.scss ./src/styles/main.css --watch",
+		"tail": "postcss tailwindcss -i ./styles/main.scss -o ./styles/main.css"
+	},
+	"dependencies": {
+		"@fortawesome/fontawesome": "^1.1.8",
+		"@fortawesome/fontawesome-svg-core": "^6.2.0",
+		"@fortawesome/free-regular-svg-icons": "^6.2.0",
+		"@fortawesome/free-solid-svg-icons": "^6.2.0",
+		"@fortawesome/react-fontawesome": "^0.2.0",
+		"@tailwindcss/typography": "^0.5.8",
+		"axios": "^0.27.2",
+		"daisyui": "^2.38.1",
+		"immer": "^9.0.16",
+		"react": "^18.2.0",
+		"react-d3-tree": "^3.3.5",
+		"react-datepicker": "^4.8.0",
+		"react-dom": "^18.2.0",
+		"react-router-dom": "^6.4.3",
+		"sass": "^1.55.0",
+		"sweetalert2": "^11.6.14",
+		"theme-change": "^2.2.0"
+	},
+	"devDependencies": {
+		"@types/react": "^18.0.22",
+		"@types/react-datepicker": "^4.8.0",
+		"@types/react-dom": "^18.0.7",
+		"@types/react-router-dom": "^5.3.3",
+		"@vitejs/plugin-react": "^2.2.0",
+		"autoprefixer": "^10.4.13",
+		"postcss": "^8.4.18",
+		"tailwindcss": "^3.2.2",
+		"typescript": "^4.6.4",
+		"vite": "^3.2.0"
+	}
+}
