@@ -3,10 +3,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import produce from "immer";
 import { useState } from "react";
 import DatePicker from "react-datepicker";
+import customToast from "../../toast";
 const EmployeeTranferLand = () => {
 	const [startDate, setStartDate] = useState(new Date());
 
 	const [verifed, setVerified] = useState(false);
+	const [otp, setOtp] = useState("");
+	const [otpVerified, setOtpVerified] = useState(false);
 
 	const [entityDocuments, setEntityDocuments] = useState<{
 		[key: string]: any;
@@ -251,16 +254,61 @@ const EmployeeTranferLand = () => {
 							</div>
 						</div>
 					</div>
-					<div className="flex justify-end w-full my-5">
-						<button className="btn btn-primary">
-							Tranfer Record
-							<FontAwesomeIcon
-								icon={faArrowRight}
-								className="mx-3"
-								size="1x"
-							/>
-						</button>
+
+					<div className="form-control max-w-md">
+						<h6 className="ml-2">
+							4) Verify OTP of previous seller
+						</h6>
+						<input
+							type="text"
+							className="input input-bordered"
+							placeholder=""
+							onChange={(e) => setOtp(e.target.value)}
+						/>
+						<div className="flex justify-end ">
+							<button
+								className="btn btn-primary btn-sm m-2"
+								onClick={(e) => {
+									if (otp === "5555") {
+										setOtpVerified(true);
+
+										customToast({
+											icon: "success",
+											message: "OTP verified",
+										});
+									}else{
+                                        customToast({
+                                            icon: "error",
+                                            message: "Invalid OTP",
+                                        })
+                                    }
+								}}
+							>
+								verify
+							</button>
+						</div>
 					</div>
+
+					{otpVerified && (
+						<div className="flex justify-end w-full my-5">
+							<button
+								className="btn btn-primary"
+								onClick={(e) => {
+									customToast({
+										icon: "success",
+										message: "Land transfer initiated",
+									});
+								}}
+							>
+								Tranfer Record
+								<FontAwesomeIcon
+									icon={faArrowRight}
+									className="mx-3"
+									size="1x"
+								/>
+							</button>
+						</div>
+					)}
 				</>
 			)}
 		</>

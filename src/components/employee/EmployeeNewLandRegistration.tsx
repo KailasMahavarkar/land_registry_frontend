@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import produce from "immer";
 import { useState } from "react";
 import DatePicker from "react-datepicker";
+import Swal from "sweetalert2";
 
 const EmployeeNewLandRegistration = () => {
 	const [startDate, setStartDate] = useState(new Date());
@@ -57,6 +58,9 @@ const EmployeeNewLandRegistration = () => {
 		addressProof: "",
 		addressProof2: "",
 	});
+
+	const [termsAndConditions, setTermsAndConditions] = useState(false);
+	const [fullverified, setFullverified] = useState(false);
 
 	return (
 		<>
@@ -182,7 +186,6 @@ const EmployeeNewLandRegistration = () => {
 					</div>
 				</div>
 			</div>
-
 			{/* Property Details */}
 			<div>
 				<h4 className="ml-2">2) Property Details</h4>
@@ -297,7 +300,6 @@ const EmployeeNewLandRegistration = () => {
 					</div>
 				</div>
 			</div>
-
 			{/* Land Related Details */}
 			<div>
 				<h4 className="ml-2">3) Land Related Documents</h4>
@@ -365,7 +367,6 @@ const EmployeeNewLandRegistration = () => {
 					</div>
 				</div>
 			</div>
-
 			{/* Land Images */}
 			<div>
 				<h4 className="ml-2">3) Land Images</h4>
@@ -413,7 +414,6 @@ const EmployeeNewLandRegistration = () => {
 					</div>
 				)}
 			</div>
-
 			{/* Owner Related Documents */}
 			<div>
 				<h4 className="ml-2">4) Owner Related Documents</h4>
@@ -481,16 +481,96 @@ const EmployeeNewLandRegistration = () => {
 					</div>
 				</div>
 			</div>
+			{/* Land Related Details */}
+			<div>
+				<h4 className="ml-2">5) Agree terms and conditions </h4>
+				<div className="flex shadow flex-col p-5">
+					<div className="form-control">
+						<label className="label">
+							<span className="label-text">Accept / Deny</span>
+						</label>
+						<input
+							type="checkbox"
+							className="checkbox"
+							checked={termsAndConditions}
+							onChange={(e) =>
+								setTermsAndConditions(e.target.checked)
+							}
+						/>
+						<span className="checkbox-mark"></span>
+					</div>
+				</div>
+				<div className="flex justify-end w-full my-5">
+					<button
+						className="btn btn-primary"
+						disabled={!termsAndConditions}
+						onClick={() => {
+							
 
-			<div className="flex justify-end w-full my-5">
-				<button className="btn btn-primary">
-					Submit New Record
-					<FontAwesomeIcon
-						icon={faArrowRight}
-						className="mx-3"
-						size="1x"
-					/>
-				</button>
+							Swal.fire({
+								icon: "info",
+								title: "Area Verification Request Submitted",
+								text: "please wait 30 days for approval, our team will contact you soon for land verification",
+								footer: "",
+							});
+						}}
+					>
+						Submit For Area Verification
+						<FontAwesomeIcon
+							icon={faArrowRight}
+							className="mx-3"
+							size="1x"
+						/>
+					</button>
+				</div>
+			</div>
+
+			<div>
+				{termsAndConditions && (
+					<>
+						<h4 className="ml-2">
+							5) Everything has been verified and found to be
+							correct{" "}
+						</h4>
+						<div className="flex shadow flex-col p-5">
+							<div className="form-control">
+								<input
+									type="checkbox"
+									className="toggle"
+									checked={fullverified}
+									onChange={(e) =>
+										setFullverified(e.target.checked)
+									}
+								/>
+								<span className="checkbox-mark"></span>
+							</div>
+						</div>
+					</>
+				)}
+				{termsAndConditions && fullverified && (
+					<div className="flex justify-end w-full my-5">
+						<button
+							className="btn btn-success"
+							onClick={() => {
+								setFullverified(true);
+
+								Swal.fire({
+									icon: "info",
+									title: "Your Land has been added to blockchain",
+									text: "",
+									footer: "",
+								});
+							}}
+						>
+							Submit To Blockchain
+							<FontAwesomeIcon
+								icon={faArrowRight}
+								className="mx-3"
+								size="1x"
+							/>
+						</button>
+					</div>
+				)}
 			</div>
 		</>
 	);

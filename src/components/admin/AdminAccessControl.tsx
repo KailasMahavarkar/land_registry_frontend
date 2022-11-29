@@ -1,17 +1,19 @@
 import { faSync } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import produce from "immer";
 import { useContext, useState } from "react";
-import CustomContext from "../../context/custom.contex";
+import CustomContext from "../../context/custom.context";
 import defaultUsers from "../../data/users.data";
 import customToast from "../../toast";
+import { employeePermissionType } from "../../types/type";
 
 const RootAccessControl = () => {
 	const { users, setUsers } = useContext(CustomContext);
 
-	const permissionChangeHandler = (e: any, id: number) => {
+	const permissionChangeHandler = (e: any, id: string) => {
 		const { name, checked } = e.target;
 		const updatedUsers = users.map((user) => {
-			if (user.id === id) {
+			if (user._id === id) {
 				return {
 					...user,
 					permissions: {
@@ -22,7 +24,16 @@ const RootAccessControl = () => {
 			}
 			return user;
 		});
-		setUsers(updatedUsers);
+		setUsers(
+            produce(users, (draft) => {
+                return draft.map((user) => {
+                    if (user._id === id) {
+                        user.permissions[name as employeePermissionType] = checked;
+                    }
+                    return user;
+                })
+            })
+        );
 	};
 
 	return (
@@ -37,15 +48,16 @@ const RootAccessControl = () => {
 							<th>Email</th>
 							<th>Role</th>
 							<th>Read</th>
-							<th>Write</th>
-							<th>Delete</th>
+							<th>Split</th>
+							<th>Merge</th>
+							<th>Lease</th>
 						</tr>
 					</thead>
 					<tbody>
 						{users.map((user) => {
 							return (
 								<tr>
-									<td>{user.id}</td>
+									<td>{user._id}</td>
 									<td>{user.name}</td>
 									<td>{user.email}</td>
 									<td>{user.role}</td>
@@ -60,39 +72,55 @@ const RootAccessControl = () => {
 											onChange={(e) => {
 												permissionChangeHandler(
 													e,
-													user.id
+													user._id
 												);
 											}}
 										/>
 									</td>
 
-									{/* write permission */}
+									{/* split permission */}
 									<td>
 										<input
 											type="checkbox"
-											name="write"
-											checked={user.permissions.write}
+											name="split"
+											checked={user.permissions.split}
 											className="checkbox checkbox-primary"
 											onChange={(e) => {
 												permissionChangeHandler(
 													e,
-													user.id
+													user._id
 												);
 											}}
 										/>
 									</td>
 
-									{/* delete permission */}
+                                    {/* merge permission */}
 									<td>
 										<input
 											type="checkbox"
-											name="delete"
-											checked={user.permissions.delete}
+											name="merge"
+											checked={user.permissions.merge}
 											className="checkbox checkbox-primary"
 											onChange={(e) => {
 												permissionChangeHandler(
 													e,
-													user.id
+													user._id
+												);
+											}}
+										/>
+									</td>
+
+									{/* lease permission */}
+									<td>
+										<input
+											type="checkbox"
+											name="lease"
+											checked={user.permissions.lease}
+											className="checkbox checkbox-primary"
+											onChange={(e) => {
+												permissionChangeHandler(
+													e,
+													user._id
 												);
 											}}
 										/>

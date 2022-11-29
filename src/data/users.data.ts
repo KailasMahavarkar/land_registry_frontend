@@ -1,36 +1,43 @@
-import { singleUserType } from './../context/custom.contex';
+import { singleUserType } from "../types/type";
+
 const defaultUsers: singleUserType[] = [
 	{
-		id: 125,
+		_id: "125",
 		name: "john",
 		email: "john@eland.gov.in",
 		role: "admin",
 		permissions: {
 			read: true,
-			write: true,
-			delete: true,
+			merge: true,
+			split: true,
+			lease: true,
+            transfer: true,
 		},
 	},
 	{
-		id: 224,
+		_id: "224",
 		name: "jane",
 		email: "jane@eland.gov.in",
 		role: "admin",
 		permissions: {
 			read: true,
-			write: true,
-			delete: false,
+			merge: true,
+			split: true,
+			lease: true,
+            transfer: true,
 		},
 	},
 	{
-		id: 325,
+		_id: "325",
 		name: "joe",
 		email: "joe@eland.gov.in",
 		role: "admin",
 		permissions: {
 			read: true,
-			write: false,
-			delete: false,
+			merge: true,
+			split: false,
+			lease: false,
+            transfer: false,
 		},
 	},
 ];

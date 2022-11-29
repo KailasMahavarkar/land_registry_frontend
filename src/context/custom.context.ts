@@ -1,22 +1,16 @@
 import { createContext } from "react";
+import { profileType, singleUserType } from "../types/type";
 
-export type singleUserType = {
-	id: number;
-	name: string;
-	email: string;
-	role: "admin" | "staff";
-	permissions: {
-		read: boolean;
-		write: boolean;
-		delete: boolean;
-	};
-};
+
 
 export type customContextType = {
 	theme: "light" | "dark";
 	setTheme: (theme: "light" | "dark") => void;
 	users: singleUserType[];
 	setUsers: (users: singleUserType[]) => void;
+
+	profile: profileType;
+	setProfile: (profile: profileType) => void;
 };
 
 export const defaultSingleLandValues = {
@@ -96,6 +90,8 @@ const CustomContext = createContext<customContextType>({
 	setTheme: () => {},
 	users: [],
 	setUsers: () => {},
+	profile: {} as any,
+	setProfile: () => {},
 });
 
 export default CustomContext;

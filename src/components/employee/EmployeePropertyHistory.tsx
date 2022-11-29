@@ -1,54 +1,37 @@
 import { faSync } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import axios from "axios";
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useEffectAsync } from "../../helper";
+import customToast from "../../toast";
+import { singleLandAttributeType } from "../../types/type";
 
 const EmployeePropertyHistory = () => {
-	const propertyHistoryArray = [
-		{
-			id: 1,
-			sellingParty: "Radhe Sham",
-			buyingParty: "Ramesh Goswami",
-			state: "maharashtra",
-			district: "mumbai",
-			taluka: "mumbai",
-			agentName: null,
-			status: "verified",
-			lastAction: "transfer",
-			lastActionDate: "12/12/2020",
-			action: "view",
-		},
 
-		{
-			id: 2,
-			sellingParty: "Ritik Shah",
-			buyingParty: "Raju Shah",
-			state: "maharashtra",
-			district: "mumbai",
-			taluka: "mumbai",
-			agentName: "kartik mistry",
-			status: "verified",
-			lastAction: "transfer",
-			lastActionDate: "12/11/2022",
-			action: "view",
-		},
-		{
-			id: 3,
-			sellingParty: "Kailas Mahavarkar",
-			buyingParty: "Mayur Sharma",
-			state: "maharashtra",
-			district: "mumbai",
-			taluka: "mumbai",
-			agentName: "ravi kumar",
-			status: "verified",
-			lastAction: "transfer",
-			lastActionDate: "12/11/2022",
-			action: "view",
-		},
-	];
+    const [history, setHistory] = useState([]);
+
+	useEffectAsync(async () => {
+		// get property history
+		const  result = await axios.get("/employee/property-history");
+
+        if (result){
+            setHistory(result.data.data);
+        }
+
+	}, []);
 
 	return (
 		<div className="overflow-x-auto">
-			<button className="btn ">
+			<button className="btn "
+                onClick={async () => {
+
+                    customToast({
+                        icon: "warning",
+                        message: "force syncing changes",
+                    })
+                }}
+            >
 				Force Sync
 				<FontAwesomeIcon className="mx-2" icon={faSync} />
 			</button>
@@ -71,7 +54,7 @@ const EmployeePropertyHistory = () => {
 					</tr>
 				</thead>
 				<tbody>
-					{propertyHistoryArray.map((item, index) => {
+					{history.map((item: any, index: number) => {
 						return (
 							<tr key={index}>
 								<td>{item.id}</td>

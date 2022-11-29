@@ -44,7 +44,7 @@ export type singleLandAttributeType = {
 	landDocuments: {
 		documentName: string;
 		documentHash: string;
-        documentLinks: string[];
+		documentLinks: string[];
 		verified: boolean;
 	}[];
 
@@ -123,4 +123,36 @@ export type complexBlockChainType = {
 	chain: Array<complexTreeInterface>;
 	updatedAt: number;
 	createAt: number;
+};
+
+export type employeeRoleType = "employee" | "admin" | "scrutiny" | "support";
+export type employeeStatus = "active" | "inactive" | "banned" | "deleted";
+export type employeePermissionType =
+	| "split"
+	| "merge"
+	| "lease"
+	| "transfer"
+	| "read";
+
+export type profileType = {
+	_id: string;
+	username: string;
+	role: employeeRoleType;
+	fullname: string;
+	email: string;
+	apikey: string;
+	datejoined: string;
+	status: employeeStatus;
+	accessToken: string;
+	refreshToken: string;
+};
+
+export type singleUserType = {
+	_id: string;
+	name: string;
+	email: string;
+	role: employeeRoleType;
+	permissions: {
+		[key in employeePermissionType]: boolean;
+	};
 };

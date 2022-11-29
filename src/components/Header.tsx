@@ -1,10 +1,18 @@
-import { faMoon, faSun } from "@fortawesome/free-solid-svg-icons";
+import { faMoon, faSun, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useContext } from "react";
-import { Link } from "react-router-dom";
-import CustomContext from "../context/custom.contex";
+import { Link, useNavigate } from "react-router-dom";
+import CustomContext from "../context/custom.context";
+import { useSelector, useDispatch } from "react-redux";
+import { profileType } from "../types/type";
+import { removeLogin } from "../redux/actions/stateCreator";
+import { useEffectAsync } from "../helper";
+
 const Header = () => {
 	const { setTheme, theme } = useContext(CustomContext);
+	const { username } = useSelector((state: profileType) => state);
+	const dispatch = useDispatch();
+	const navigate = useNavigate();
 
 	return (
 		<div className="navbar bg-base-100 shadow-md rounded-md">
@@ -54,11 +62,33 @@ const Header = () => {
 			{/* {media.onGreaterThanMobile() && <NavBarItems />} */}
 
 			<div className="navbar-end child:mx-1">
-				<Link to="login">
-					<button className="btn btn-outline btn-sm">
-						Admin & Employee Login
+				{username ? (
+					<Link to="login">
+						<button className="btn btn-outline btn-sm">
+							Welcome to Land Registry System
+						</button>
+					</Link>
+				) : (
+					<Link to="login">
+						<button className="btn btn-outline btn-sm">
+							Admin & Employee Login
+						</button>
+					</Link>
+				)}
+
+				{username && (
+					<button
+						className="btn btn-outline btn-error btn-sm"
+						onClick={() => {
+							dispatch(removeLogin());
+
+							navigate("/login");
+						}}
+					>
+						Logout
+						<FontAwesomeIcon icon={faUser} />
 					</button>
-				</Link>
+				)}
 
 				<button
 					className="btn btn-circle btn-ghost"

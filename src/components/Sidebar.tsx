@@ -48,7 +48,6 @@ const navArray = [
 ];
 
 const SideBar = () => {
-	let navigate = useNavigate();
 	return (
 		<ul className=" bg-transparent menu p-2 ">
 			{navArray.map(

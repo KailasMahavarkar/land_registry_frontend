@@ -1,30 +1,25 @@
 import { faAdd, faUsers } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import Swal from "sweetalert2";
 import defaultUsers from "../../data/users.data";
 import produce from "immer";
-import CustomContext from "../../context/custom.contex";
+import CustomContext from "../../context/custom.context";
+import axios from "axios";
+import {
+	employeePermissionType,
+	employeeRoleType,
+	profileType,
+	singleUserType,
+} from "../../types/type";
 
 const AdminUserManagement = () => {
 	const { users, setUsers } = useContext(CustomContext);
-	const [actions, setActions] = React.useState({
+	const [actions, setActions] = useState({
 		add: false,
 	});
 
-	const [newUser, setNewUser] = React.useState({
-		id: 0,
-		name: "",
-		email: "",
-		role: "staff",
-		permissions: {
-			read: true,
-			write: false,
-			delete: false,
-		},
-	});
-
-	const [userType, setUserType] = React.useState<"admin" | "staff">("admin");
+	const [userType, setUserType] = useState<"admin" | "staff">("admin");
 
 	const UserTableView = () => {
 		return (
@@ -40,7 +35,7 @@ const AdminUserManagement = () => {
 					{users.map((user, index) => {
 						return (
 							<tr key={index}>
-								<td>{user.id}</td>
+								<td>{user._id}</td>
 								<td>{user.name}</td>
 								<td>
 									<button
@@ -60,7 +55,8 @@ const AdminUserManagement = () => {
 													const updatedUsers =
 														users.filter(
 															(u) =>
-																u.id !== user.id
+																u._id !==
+																user._id
 														);
 													setUsers(updatedUsers);
 													Swal.fire(
@@ -84,6 +80,26 @@ const AdminUserManagement = () => {
 	};
 
 	const NewUserForm = () => {
+		const [newUser, setNewUser] = useState<singleUserType>({
+			_id: "",
+			role: "employee",
+			name: "",
+			email: "",
+			permissions: {
+				transfer: false,
+				lease: false,
+				split: false,
+				merge: false,
+				read: false,
+			},
+		});
+
+		const handleAddUser = () => {
+			axios.post("/employee/create", {
+				username: "",
+			});
+		};
+
 		return (
 			<div className="flex flex-col items-center justify-center w-full">
 				<div className="flex justify-center items-center shadow-md w-full ">
@@ -142,7 +158,8 @@ const AdminUserManagement = () => {
 									);
 									setNewUser(
 										produce(newUser, (draft) => {
-											draft.role = e.target.value;
+											draft.role = e.target
+												.value as employeeRoleType;
 										})
 									);
 								}}
@@ -154,7 +171,7 @@ const AdminUserManagement = () => {
 						{/* Access */}
 						<div className="form-control">
 							<label className="label cursor-pointer">
-								<span className="label-text">Read</span>
+								<span className="label-text">Transfer</span>
 								<input
 									type="checkbox"
 									checked={newUser.permissions.read}
@@ -164,41 +181,41 @@ const AdminUserManagement = () => {
 								/>
 							</label>
 
-							<label className="label cursor-pointer">
-								<span className="label-text">Write</span>
-								<input
-									type="checkbox"
-									checked={newUser.permissions.write}
-									className="checkbox checkbox-primary"
-									disabled={userType === "staff"}
-									onClick={(e) => {
-										setNewUser(
-											produce(newUser, (draft) => {
-												draft.permissions.write =
-													!draft.permissions.write;
-											})
-										);
-									}}
-								/>
-							</label>
-
-							<label className="label cursor-pointer">
-								<span className="label-text">Delete</span>
-								<input
-									type="checkbox"
-									checked={newUser.permissions.delete}
-									className="checkbox checkbox-primary"
-									disabled={userType === "staff"}
-									onChange={(e) => {
-										setNewUser(
-											produce(newUser, (draft) => {
-												draft.permissions.delete =
-													!draft.permissions.delete;
-											})
-										);
-									}}
-								/>
-							</label>
+							{[
+								"transfer" as employeePermissionType,
+								"lease" as employeePermissionType,
+								"split" as employeePermissionType,
+								"merge" as employeePermissionType,
+								"read" as employeePermissionType,
+							].map((permission: employeePermissionType) => {
+								return (
+									<label className="label cursor-pointer">
+										<span className="label-text">
+											{permission}
+										</span>
+										<input
+											type="checkbox"
+											checked={
+												newUser.permissions[permission]
+											}
+											className="checkbox checkbox-primary"
+											onChange={(e) => {
+												setNewUser(
+													produce(
+														newUser,
+														(draft) => {
+															draft.permissions[
+																permission
+															] =
+																e.target.checked;
+														}
+													)
+												);
+											}}
+										/>
+									</label>
+								);
+							})}
 						</div>
 
 						{/* Button */}

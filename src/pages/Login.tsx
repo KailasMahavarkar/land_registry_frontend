@@ -1,45 +1,58 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import axios from "axios";
 import customToast from "../toast";
-
-// style --> formstyle
+import { sha512 } from "js-sha512";
+import produce from "immer";
+import { useNavigate } from "react-router-dom";
+import CustomContext from "../context/custom.context";
+import { parseJwt } from "../helper";
+import { useDispatch } from "react-redux";
+import { addLogin } from "../redux/actions/stateCreator";
+import { profileType } from "../types/type";
 
 // profile form
 const LoginForm = () => {
-	const initalState = {
+	// profile form state
+	const [user, setUser] = useState({
 		username: "",
 		password: "",
-	};
-
-	// profile form state
-	const [profile, setProfile] = useState(initalState);
-
-
-	// get profile data from redux
-	// useEffectAsync(() => {
-	// 	setProfile({
-	// 		fullname: user.fullname || "",
-	// 		email: user.email || "",
-	// 		phone: user.phone || 0,
-	// 		country: user.country || "India",
-	// 	});
-	// }, []);
-
-	// const handleChange = (key: string, value: any) => {
-	// 	setProfile({
-	// 		...profile,
-	// 		[key]: value,
-	// 	});
-	// };
+	});
+	// const [userType, setUserType] = useState<"admin" | "employee">("employee");
+	const navigate = useNavigate();
+	const dispatch = useDispatch();
 
 	const formSubmitHandler = async () => {
 		try {
-			const result = await axios.patch("/user/login", profile);
-
-			return customToast({
-				icon: "info",
-				message: "Profile updated",
+			const result = await axios.post("/auth/login", {
+				username: user.username,
+				password: sha512(user.password).toString(),
 			});
+
+			if (result.data.status === "success") {
+				customToast({
+					icon: "success",
+					message: "Login Success",
+				});
+			}
+			const tokens = result.data.data;
+
+			if (tokens) {
+				const temp = parseJwt(tokens.accessToken) as profileType;
+
+				dispatch(
+					addLogin({
+						...temp,
+						accessToken: tokens.accessToken,
+						refreshToken: tokens.refreshToken,
+					})
+				);
+
+				if (temp.role === "admin") {
+					navigate("/admin-dashboard");
+				} else {
+					navigate("/dashboard");
+				}
+			}
 		} catch (error: any) {
 			if (error.response?.data?.msg === "profile already updated") {
 				return customToast({
@@ -59,7 +72,7 @@ const LoginForm = () => {
 		<div className="flex justify-center items-center shadow-md w-full ">
 			<div className="flex flex-col shadow p-10 dark:border-[1px] dark:rounded-md">
 				<h2 className="m-0 text-center ">Login Form</h2>
-				{/* Full Name */}
+				{/* USERNAME */}
 				<div className="form-control">
 					<label className="label">
 						<span className="label-text">UserName</span>
@@ -68,17 +81,18 @@ const LoginForm = () => {
 					<input
 						type="email"
 						className="input input-bordered"
-						value={profile.username}
+						value={user.username}
 						onChange={(e) => {
-							setProfile({
-								...profile,
-								username: e.target.value,
-							});
+							setUser(
+								produce(user, (draft) => {
+									draft.username = e.target.value;
+								})
+							);
 						}}
 					/>
 				</div>
 
-				{/* Email */}
+				{/* PASSWORD */}
 				<div className="form-control ">
 					<label className="label">
 						<span className="label-text">Password</span>
@@ -87,32 +101,33 @@ const LoginForm = () => {
 					<input
 						type="password"
 						className="input input-bordered"
-						value={profile.password}
+						value={user.password}
 						onChange={(e) => {
-							setProfile({
-								...profile,
-								password: e.target.value,
-							});
+							setUser(
+								produce(user, (draft) => {
+									draft.password = e.target.value;
+								})
+							);
 						}}
 					/>
 				</div>
 
-				{/* select */}
-				<div className="form-control ">
+				{/* <div className="form-control ">
 					<label className="label">
 						<span className="label-text">User Type</span>
 						<span className="label-text"></span>
 					</label>
-					{/* select */}
 					<select
 						className="input input-bordered"
-						value={profile.password}
-						onChange={(e) => {}}
+						value={userType}
+						onChange={(e) => {
+							setUserType(e.target.value as "admin" | "employee");
+						}}
 					>
-						<option value="1">admin</option>
-						<option value="2">root</option>
+						<option value="admin">admin</option>
+						<option value="employee">employee</option>
 					</select>
-				</div>
+				</div> */}
 
 				{/* Button */}
 				<div className="form-control">
