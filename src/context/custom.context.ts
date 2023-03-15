@@ -4,94 +4,102 @@ import { profileType, singleUserType } from "../types/type";
 
 
 export type customContextType = {
-	theme: "light" | "dark";
-	setTheme: (theme: "light" | "dark") => void;
-	users: singleUserType[];
-	setUsers: (users: singleUserType[]) => void;
+    theme: "light" | "dark";
+    setTheme: (theme: "light" | "dark") => void;
+    users: singleUserType[];
+    setUsers: (users: singleUserType[]) => void;
 
-	profile: profileType;
-	setProfile: (profile: profileType) => void;
+    profile: profileType;
+    setProfile: (profile: profileType) => void;
+
+    drizzle: any;
+    drizzleState: any;
+    initialized: any
 };
 
 export const defaultSingleLandValues = {
-	name: "",
-	attributes: {
-		token: "",
-		// geolocation
-		geoLocation: {
-			corners: [
-				{
-					lat: 0,
-					lng: 0,
-				},
-				{
-					lat: 0,
-					lng: 0,
-				},
-				{
-					lat: 0,
-					lng: 0,
-				},
-				{
-					lat: 0,
-					lng: 0,
-				},
-			],
-			center: {
-				lat: 0,
-				lng: 0,
-			},
-		},
+    name: "",
+    attributes: {
+        token: "",
+        // geolocation
+        geoLocation: {
+            corners: [
+                {
+                    lat: 0,
+                    lng: 0,
+                },
+                {
+                    lat: 0,
+                    lng: 0,
+                },
+                {
+                    lat: 0,
+                    lng: 0,
+                },
+                {
+                    lat: 0,
+                    lng: 0,
+                },
+            ],
+            center: {
+                lat: 0,
+                lng: 0,
+            },
+        },
 
-		// reference
-		isPolygon: false,
-		isRectangle: false,
+        // reference
+        isPolygon: false,
+        isRectangle: false,
 
-		// owner details
-		owner: "",
-		ownerAddress: "",
-		ownerEmail: "",
-		ownerPhone: "",
+        // owner details
+        owner: "",
+        ownerAddress: "",
+        ownerEmail: "",
+        ownerPhone: "",
 
-		// owner document details
-		ownerDocuments: [],
+        // owner document details
+        ownerDocuments: [],
 
-		// land document details
-		landDocuments: [],
+        // land document details
+        landDocuments: [],
 
-		// land images
-		landImages: [],
+        // land images
+        landImages: [],
 
-		// plot details
-		price: 0,
-		status: "Available",
-		description: "",
+        // plot details
+        price: 0,
+        status: "Available",
+        description: "",
 
-		// government details
-		government: "",
-		governmenttype: "",
+        // government details
+        government: "",
+        governmenttype: "",
 
-		// updates
-		updates: [],
+        // updates
+        updates: [],
 
-		// timestamps
-		createdAt: 0,
-		updatedAt: 0,
-		deletedAt: 0,
+        // timestamps
+        createdAt: 0,
+        updatedAt: 0,
+        deletedAt: 0,
 
-		// validation
-		isChainValid: false,
-	},
-	children: [],
+        // validation
+        isChainValid: false,
+    },
+    children: [],
 };
 
 const CustomContext = createContext<customContextType>({
-	theme: "light",
-	setTheme: () => {},
-	users: [],
-	setUsers: () => {},
-	profile: {} as any,
-	setProfile: () => {},
+    theme: "light",
+    setTheme: () => { },
+    users: [],
+    setUsers: () => { },
+    profile: {} as any,
+    setProfile: () => { },
+
+    drizzle: {} as any,
+    drizzleState: {} as any,
+    initialized: false
 });
 
 export default CustomContext;

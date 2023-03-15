@@ -1,13 +1,13 @@
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import produce from "immer";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import Swal from "sweetalert2";
+import CustomContext from "../../context/custom.context";
 
 const EmployeeNewLandRegistration = () => {
-	const [startDate, setStartDate] = useState(new Date());
-
+	const { drizzle, drizzleState } = useContext(CustomContext);
 	const [landDocuments, setLandDocuments] = useState<{
 		[key: string]: any;
 	}>({
@@ -59,8 +59,66 @@ const EmployeeNewLandRegistration = () => {
 		addressProof2: "",
 	});
 
-	const [termsAndConditions, setTermsAndConditions] = useState(false);
-	const [fullverified, setFullverified] = useState(false);
+	const [property, setProperty] = useState({
+		propertyHouseNumber: "",
+		propertyStreetName: "",
+		propertyType: "",
+		propertyArea: 0,
+		propertyPincode: 0,
+		propertyState: "",
+		propertyVillage: "",
+		propertyDistrict: "",
+		propertyTaluka: "",
+
+		// owner details
+		ownerName: "",
+		aadharCardNumber: "",
+		panCardNumber: "",
+		addressProofA: "",
+		addressProofB: "",
+		// transfer details (if any)
+		transfered: false,
+		transferedTo: 0,
+		transferedFrom: [],
+		propertySplitLandId: [],
+		// ownership details
+		surveyNumber: 4096,
+		subSurveyNumber: 4096,
+		createdOn: "15-3-23",
+	});
+
+	// [
+	// 	"JK house",
+	// 	"route 66",
+	// 	"residential",
+	// 	800,
+	// 	400070,
+	// 	"maharashtra",
+	// 	"mumbai",
+	// 	"mumbai",
+	// 	"mumbai",
+	// 	"kailas",
+	// 	"3782",
+	// 	"DMN",
+	// 	"light bill",
+	// 	"ration card",
+	// 	false,
+	// 	5666736,
+	// 	[],
+	// 	[],
+	// 	2048,
+	// 	2048,
+	// 	"15-3-23",
+	// ];
+
+	const registerPropertyHandler = () => {
+		drizzle.contracts.LandRegistry.methods
+			.registerNewProperty(property)
+			.send();
+	};
+
+	const [termsAndConditions, setTermsAndConditions] = useState(true);
+	const [fullverified, setFullverified] = useState(true);
 
 	return (
 		<>
@@ -86,6 +144,13 @@ const EmployeeNewLandRegistration = () => {
 								type="text"
 								placeholder="Type here"
 								className="input input-bordered w-full max-w-xs"
+								onChange={(e) => {
+									setProperty(
+										produce(property, (draft) => {
+											draft.ownerName = e.target.value;
+										})
+									);
+								}}
 							/>
 						</div>
 
@@ -100,87 +165,14 @@ const EmployeeNewLandRegistration = () => {
 								type="text"
 								placeholder="Type here"
 								className="input input-bordered w-full max-w-xs"
-							/>
-						</div>
-					</div>
-
-					{/* DOB & Gender  */}
-					<div className="flex justify-around w-full">
-						<div className="form-control w-full max-w-xs">
-							<label className="label">
-								<span className="label-text">
-									Date of Birth
-								</span>
-							</label>
-							<DatePicker
-								className="input input-bordered w-full max-w-xs"
-								selected={startDate}
-								onChange={(date: any) => setStartDate(date)}
-								peekNextMonth
-								showMonthDropdown
-								showYearDropdown
-								dropdownMode="select"
-							/>
-						</div>
-
-						<div className="form-control w-full max-w-xs">
-							<label className="label">
-								<span className="label-text">
-									Gender
-									<span className="text-red-500">{" *"}</span>
-								</span>
-							</label>
-							<select className="select  select-bordered w-full max-w-xs">
-								<option>Male</option>
-								<option>Female</option>
-								<option>Others</option>
-							</select>
-						</div>
-					</div>
-
-					{/* House & Street  */}
-					<div className="flex justify-around w-full">
-						<div className="form-control w-full max-w-xs">
-							<label className="label">
-								<span className="label-text">House Number</span>
-							</label>
-							<input
-								type="text"
-								className="input input-bordered w-full max-w-xs"
-							/>
-						</div>
-						<div className="form-control w-full max-w-xs">
-							<label className="label">
-								<span className="label-text">Street Name</span>
-							</label>
-							<input
-								type="text"
-								className="input input-bordered w-full max-w-xs"
-							/>
-						</div>
-					</div>
-
-					{/* DOB & Gender  */}
-					<div className="flex justify-around w-full">
-						<div className="form-control w-full max-w-xs">
-							<label className="label">
-								<span className="label-text">Pincode</span>
-							</label>
-							<input
-								type="number"
-								placeholder="eg. 400001"
-								className="input input-bordered w-full max-w-xs"
-							/>
-						</div>
-
-						<div className="form-control w-full max-w-xs">
-							<label className="label">
-								<span className="label-text">District</span>
-							</label>
-							<input
-								type="number"
-								placeholder="eg. Mumbai"
-								className="input input-bordered w-full max-w-xs"
+								onChange={(e) => {
+									setProperty(
+										produce(property, (draft) => {
+											draft.aadharCardNumber =
+												e.target.value;
+										})
+									);
+								}}
 							/>
 						</div>
 					</div>
@@ -199,6 +191,12 @@ const EmployeeNewLandRegistration = () => {
 							<input
 								type="text"
 								className="input input-bordered w-full max-w-xs"
+								onChange={(e) => {
+									setProperty({
+										...property,
+										propertyHouseNumber: e.target.value,
+									});
+								}}
 							/>
 						</div>
 						<div className="form-control w-full max-w-xs">
@@ -208,6 +206,12 @@ const EmployeeNewLandRegistration = () => {
 							<input
 								type="text"
 								className="input input-bordered w-full max-w-xs"
+								onChange={(e) => {
+									setProperty({
+										...property,
+										propertyStreetName: e.target.value,
+									});
+								}}
 							/>
 						</div>
 					</div>
@@ -235,47 +239,67 @@ const EmployeeNewLandRegistration = () => {
 									<span className="text-red-500">{" *"}</span>
 								</span>
 							</label>
-							<select className="select  select-bordered w-full max-w-xs">
-								<option>Residential</option>
-								<option>Commercial</option>
-								<option>Industrial</option>
+							<select
+								className="select  select-bordered w-full max-w-xs"
+								onChange={(e) => {
+									setProperty({
+										...property,
+										propertyType: e.target.value,
+									});
+								}}
+							>
+								<option>residential</option>
+								<option>commercial</option>
+								<option>industrial</option>
 							</select>
 						</div>
 					</div>
 
-					{/* Property Dimension */}
+					{/* Area & Dimension */}
 					<div className="flex justify-around w-full">
 						<div className="form-control w-full max-w-xs">
 							<label className="label">
 								<span className="label-text">
-									Property Area
-									<span className="text-red-500">{" *"}</span>
-								</span>
-							</label>
-							<input
-								type="text"
-								placeholder="Type here"
-								className="input input-bordered w-full max-w-xs"
-							/>
-						</div>
-
-						<div className="form-control w-full max-w-xs">
-							<label className="label">
-								<span className="label-text">
-									Property Floor
+									Property Area(sq.ft)
 									<span className="text-red-500">{" *"}</span>
 								</span>
 							</label>
 							<input
 								type="number"
-								defaultValue="Base"
+								placeholder="300"
+								className="input input-bordered w-full max-w-xs"
+								onChange={(e) => {
+									setProperty({
+										...property,
+										propertyArea: Number(e.target.value),
+									});
+								}}
+							/>
+						</div>
+
+						<div className="form-control w-full max-w-xs">
+							<label className="label">
+								<span className="label-text">
+									Property District
+									<span className="text-red-500">{" *"}</span>
+								</span>
+							</label>
+							<input
+								type="text"
+								defaultValue="mumbai"
 								placeholder="Type here"
 								className="input input-bordered w-full max-w-xs"
+								onChange={(e) => {
+									setProperty({
+										...property,
+										propertyDistrict: e.target.value,
+									});
+								}}
 							/>
 						</div>
 					</div>
 
-					{/* DOB & Gender  */}
+					{/* Pincode & Taluka  */}
 					<div className="flex justify-around w-full">
 						<div className="form-control w-full max-w-xs">
 							<label className="label">
@@ -285,23 +309,35 @@ const EmployeeNewLandRegistration = () => {
 								type="number"
 								placeholder="eg. 400001"
 								className="input input-bordered w-full max-w-xs"
+								onChange={(e) => {
+									setProperty({
+										...property,
+										propertyPincode: Number(e.target.value),
+									});
+								}}
 							/>
 						</div>
 						<div className="form-control w-full max-w-xs">
 							<label className="label">
-								<span className="label-text">District</span>
+								<span className="label-text">Taluka</span>
 							</label>
 							<input
 								type="number"
 								placeholder="eg. Mumbai"
 								className="input input-bordered w-full max-w-xs"
+								onChange={(e) => {
+									setProperty({
+										...property,
+										propertyTaluka: e.target.value,
+									});
+								}}
 							/>
 						</div>
 					</div>
 				</div>
 			</div>
 			{/* Land Related Details */}
-			<div>
+			{/* <div>
 				<h4 className="ml-2">3) Land Related Documents</h4>
 				<div className="flex shadow flex-col p-5">
 					<div className="overflow-x-auto">
@@ -366,9 +402,9 @@ const EmployeeNewLandRegistration = () => {
 						</table>
 					</div>
 				</div>
-			</div>
+			</div> */}
 			{/* Land Images */}
-			<div>
+			{/* <div>
 				<h4 className="ml-2">3) Land Images</h4>
 				<div className="flex justify-center">
 					<input
@@ -376,7 +412,6 @@ const EmployeeNewLandRegistration = () => {
 						className="custom-file-input w-full"
 						multiple={true}
 						onChange={(e: any) => {
-							// loop through all the files and add them to the array
 							if (e.target.files) {
 								for (
 									let i = 0;
@@ -394,7 +429,6 @@ const EmployeeNewLandRegistration = () => {
 				</div>
 				{landImages.length > 0 && (
 					<div className="flex shadow flex-col p-5">
-						{/* show images as grid */}
 						<div className="grid grid-cols-3 gap-4">
 							{landImages.map((image: any, index: any) => {
 								return (
@@ -413,9 +447,9 @@ const EmployeeNewLandRegistration = () => {
 						</div>
 					</div>
 				)}
-			</div>
+			</div> */}
 			{/* Owner Related Documents */}
-			<div>
+			{/* <div>
 				<h4 className="ml-2">4) Owner Related Documents</h4>
 				<div className="flex shadow flex-col p-5">
 					<div className="overflow-x-auto">
@@ -480,7 +514,7 @@ const EmployeeNewLandRegistration = () => {
 						</table>
 					</div>
 				</div>
-			</div>
+			</div> */}
 			{/* Land Related Details */}
 			<div>
 				<h4 className="ml-2">5) Agree terms and conditions </h4>
@@ -505,8 +539,8 @@ const EmployeeNewLandRegistration = () => {
 						className="btn btn-primary"
 						disabled={!termsAndConditions}
 						onClick={() => {
-							
 
+                            registerPropertyHandler();
 							Swal.fire({
 								icon: "info",
 								title: "Area Verification Request Submitted",
@@ -526,7 +560,7 @@ const EmployeeNewLandRegistration = () => {
 			</div>
 
 			<div>
-				{termsAndConditions && (
+				{(termsAndConditions || true) && (
 					<>
 						<h4 className="ml-2">
 							5) Everything has been verified and found to be
@@ -575,5 +609,7 @@ const EmployeeNewLandRegistration = () => {
 		</>
 	);
 };
+
+
 
 export default EmployeeNewLandRegistration;

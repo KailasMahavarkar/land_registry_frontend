@@ -1,15 +1,17 @@
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import produce from "immer";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import DatePicker from "react-datepicker";
 import customToast from "../../toast";
+import CustomContext from "../../context/custom.context";
 const EmployeeTranferLand = () => {
 	const [startDate, setStartDate] = useState(new Date());
+	const { drizzle } = useContext(CustomContext);
 
 	const [verifed, setVerified] = useState(false);
 	const [otp, setOtp] = useState("");
-	const [otpVerified, setOtpVerified] = useState(false);
+	const [otpVerified, setOtpVerified] = useState(true);
 
 	const [entityDocuments, setEntityDocuments] = useState<{
 		[key: string]: any;
@@ -18,6 +20,18 @@ const EmployeeTranferLand = () => {
 		panCard: "",
 		addressProof: "",
 	});
+
+	const [newOwnerDetails, setNewOwnerDetails] = useState({
+		newOwnerName: "",
+		newOwnerAadharCardNumber: "",
+		newOwnerPanCardNumber: "",
+		newOwnerAddressProofA: "",
+		newOwnerAddressProofB: "",
+	});
+
+	const tranferOwnerShipHandler = () => {
+		
+	};
 
 	return (
 		<>
@@ -66,6 +80,12 @@ const EmployeeTranferLand = () => {
 										type="text"
 										placeholder="Type here"
 										className="input input-bordered w-full max-w-xs"
+										onChange={(e) => {
+											setNewOwnerDetails({
+												...newOwnerDetails,
+												newOwnerName: e.target.value,
+											});
+										}}
 									/>
 								</div>
 
@@ -82,45 +102,14 @@ const EmployeeTranferLand = () => {
 										type="text"
 										placeholder="Type here"
 										className="input input-bordered w-full max-w-xs"
+										onChange={(e) => {
+											setNewOwnerDetails({
+												...newOwnerDetails,
+												newOwnerAadharCardNumber:
+													e.target.value,
+											});
+										}}
 									/>
-								</div>
-							</div>
-
-							{/* DOB & Gender  */}
-							<div className="flex justify-around w-full">
-								<div className="form-control w-full max-w-xs">
-									<label className="label">
-										<span className="label-text">
-											Date of Birth
-										</span>
-									</label>
-									<DatePicker
-										className="input input-bordered w-full max-w-xs"
-										selected={startDate}
-										onChange={(date: any) =>
-											setStartDate(date)
-										}
-										peekNextMonth
-										showMonthDropdown
-										showYearDropdown
-										dropdownMode="select"
-									/>
-								</div>
-
-								<div className="form-control w-full max-w-xs">
-									<label className="label">
-										<span className="label-text">
-											Gender
-											<span className="text-red-500">
-												{" *"}
-											</span>
-										</span>
-									</label>
-									<select className="select  select-bordered w-full max-w-xs">
-										<option>Male</option>
-										<option>Female</option>
-										<option>Others</option>
-									</select>
 								</div>
 							</div>
 
@@ -129,23 +118,37 @@ const EmployeeTranferLand = () => {
 								<div className="form-control w-full max-w-xs">
 									<label className="label">
 										<span className="label-text">
-											House Number
+											Pan Number
 										</span>
 									</label>
 									<input
 										type="text"
 										className="input input-bordered w-full max-w-xs"
+										onChange={(e) => {
+											setNewOwnerDetails({
+												...newOwnerDetails,
+												newOwnerPanCardNumber:
+													e.target.value,
+											});
+										}}
 									/>
 								</div>
 								<div className="form-control w-full max-w-xs">
 									<label className="label">
 										<span className="label-text">
-											Street Name
+											Address Proof A
 										</span>
 									</label>
 									<input
 										type="text"
 										className="input input-bordered w-full max-w-xs"
+										onChange={(e) => {
+											setNewOwnerDetails({
+												...newOwnerDetails,
+												newOwnerAddressProofA:
+													e.target.value,
+											});
+										}}
 									/>
 								</div>
 							</div>
@@ -155,33 +158,27 @@ const EmployeeTranferLand = () => {
 								<div className="form-control w-full max-w-xs">
 									<label className="label">
 										<span className="label-text">
-											Pincode
+											Address Proof B
 										</span>
 									</label>
 									<input
 										type="number"
 										placeholder="eg. 400001"
 										className="input input-bordered w-full max-w-xs"
-									/>
-								</div>
-
-								<div className="form-control w-full max-w-xs">
-									<label className="label">
-										<span className="label-text">
-											District
-										</span>
-									</label>
-									<input
-										type="number"
-										placeholder="eg. Mumbai"
-										className="input input-bordered w-full max-w-xs"
+										onChange={(e) => {
+											setNewOwnerDetails({
+												...newOwnerDetails,
+												newOwnerAddressProofB:
+													e.target.value,
+											});
+										}}
 									/>
 								</div>
 							</div>
 						</div>
 					</div>
 
-					<div>
+					{/* <div>
 						<h4 className="ml-2">3) Buyer Documents</h4>
 						<div className="flex shadow flex-col p-5">
 							<div className="overflow-x-auto">
@@ -253,9 +250,9 @@ const EmployeeTranferLand = () => {
 								</table>
 							</div>
 						</div>
-					</div>
+					</div> */}
 
-					<div className="form-control max-w-md">
+					{/* <div className="form-control max-w-md">
 						<h6 className="ml-2">
 							4) Verify OTP of previous seller
 						</h6>
@@ -276,28 +273,31 @@ const EmployeeTranferLand = () => {
 											icon: "success",
 											message: "OTP verified",
 										});
-									}else{
-                                        customToast({
-                                            icon: "error",
-                                            message: "Invalid OTP",
-                                        })
-                                    }
+									} else {
+										customToast({
+											icon: "error",
+											message: "Invalid OTP",
+										});
+									}
 								}}
 							>
 								verify
 							</button>
 						</div>
-					</div>
+					</div> */}
 
 					{otpVerified && (
 						<div className="flex justify-end w-full my-5">
 							<button
 								className="btn btn-primary"
 								onClick={(e) => {
-									customToast({
-										icon: "success",
-										message: "Land transfer initiated",
-									});
+									tranferOwnerShipHandler();
+									setTimeout(() => {
+										customToast({
+											icon: "success",
+											message: "Land transfer initiated",
+										});
+									}, 1000);
 								}}
 							>
 								Tranfer Record

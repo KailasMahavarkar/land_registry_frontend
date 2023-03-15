@@ -5,6 +5,8 @@ import AdminPropertyHistory from "../components/employee/EmployeePropertyHistory
 import AdminSplitLandCase from "../components/employee/EmployeeSplitLandCase";
 import AdminTransferLand from "../components/employee/EmployeeTransferLand";
 
+
+
 const AdminDashboard = () => {
 	const [active, setActive] = useState("New Registration");
     

@@ -65,7 +65,7 @@ const SearchBarToken = () => {
 								>
 									<figure>
 										<img
-											src="https://placeimg.com/300/200/arch"
+											src="https://placehold.jp/000000/ffffff/300x200.png?text=Property"
 											alt="Movie"
 										/>
 									</figure>
