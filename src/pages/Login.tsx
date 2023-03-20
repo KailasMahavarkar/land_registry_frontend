@@ -17,16 +17,19 @@ const LoginForm = () => {
 		username: "",
 		password: "",
 	});
-	// const [userType, setUserType] = useState<"admin" | "employee">("employee");
+
+    const dispatch = useDispatch();
 	const navigate = useNavigate();
-	const dispatch = useDispatch();
 
 	const formSubmitHandler = async () => {
+        const data =  {
+            username: user.username,
+            password: sha512(user.password).toString(),
+        }
+        console.log(data)
+
 		try {
-			const result = await axios.post("/auth/login", {
-				username: user.username,
-				password: sha512(user.password).toString(),
-			});
+			const result = await axios.post("/auth/login", data);
 
 			if (result.data.status === "success") {
 				customToast({

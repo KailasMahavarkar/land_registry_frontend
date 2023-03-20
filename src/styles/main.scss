@@ -4,92 +4,134 @@
 
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap");
 #root {
-	height: 100% !important;
+    height: 100% !important;
 }
 
 // remove underline from links
 a {
-	text-decoration: none !important;
+    text-decoration: none !important;
 }
 
 html,
 body {
-	font-family: "Roboto", sans-serif;
+    font-family: "Roboto", sans-serif;
 }
 
 html {
-	display: block;
-	height: 100%;
-	width: 100%;
+    display: block;
+    height: 100%;
+    width: 100%;
 }
 
 body {
-	height: 100%;
+    height: 100%;
 }
 
 html,
 body {
-	padding: 0;
-	margin: 0;
-	scroll-behavior: smooth;
+    padding: 0;
+    margin: 0;
+    scroll-behavior: smooth;
 }
 .main {
-	display: flex;
-	height: 100%;
-	width: 100%;
+    display: flex;
+    height: 100%;
+    width: 100%;
 }
 
 .main > div {
-	flex: 1;
-	margin: 5px;
+    flex: 1;
+    margin: 5px;
 }
 
 .main > .sidebar {
-	flex: 0 0 300px;
+    flex: 0 0 300px;
 }
 
 .form-wrapper {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	width: 100%;
-	height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
 }
 
 form {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	padding: 20px;
-	border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 20px;
+    border-radius: 10px;
 }
 
 .test {
-	border: 1px solid red !important;
+    border: 1px solid red !important;
 }
 
 .test2 {
-	border: 1px solid cyan;
+    border: 1px solid cyan;
 }
 
 .custom-file-input::-webkit-file-upload-button {
-	display: none;
+    display: none;
 }
 .custom-file-input::before {
-	content: "Select some files";
-	display: inline-block;
-	background-color: transparent;
-	border: 1px solid #999;
-	border-radius: 3px;
-	padding: 5px 8px;
-	outline: none;
-	white-space: nowrap;
-	cursor: pointer;
-	text-shadow: 1px 1px #fff;
-	font-weight: 700;
-	font-size: 10pt;
+    content: "Select some files";
+    display: inline-block;
+    background-color: transparent;
+    border: 1px solid #999;
+    border-radius: 3px;
+    padding: 5px 8px;
+    outline: none;
+    white-space: nowrap;
+    cursor: pointer;
+    text-shadow: 1px 1px #fff;
+    font-weight: 700;
+    font-size: 10pt;
 
-	&:hover {
-		background-color: #105a80;
-	}
+    &:hover {
+        background-color: #105a80;
+    }
+}
+
+.tree-element {
+    margin: 0 0 0 4px;
+    position: relative;
+}
+
+.tree-element.is-child {
+    margin-left: 16px;
+}
+
+div.tree-element::before {
+    content: "";
+    position: absolute;
+    top: 24px;
+    left: 1px;
+    height: calc(100% - 48px);
+    border-left: 1px solid gray;
+}
+
+p.tree-element {
+    margin-left: 16px;
+}
+
+.toggler {
+    position: absolute;
+    top: 10px;
+    left: 0px;
+    width: 0;
+    height: 0;
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+    border-left: 5px solid gray;
+    cursor: pointer;
+}
+
+.toggler.closed {
+    transform: rotate(90deg);
+}
+
+.collapsed {
+    display: none;
 }

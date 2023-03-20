@@ -1,184 +1,195 @@
-import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRight, faCheck } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import produce from "immer";
 import { useContext, useState } from "react";
 import DatePicker from "react-datepicker";
 import customToast from "../../toast";
 import CustomContext from "../../context/custom.context";
+import { singleDocument } from "../../types/type";
+import ImageTable from "../ImageTable";
+import axios from "axios";
+import useDrizzle from "../../hooks/useDrizzle";
+import LandTokenVerify from "../LandTokenVerify";
 const EmployeeTranferLand = () => {
-	const [startDate, setStartDate] = useState(new Date());
-	const { drizzle } = useContext(CustomContext);
 
-	const [verifed, setVerified] = useState(false);
-	const [otp, setOtp] = useState("");
-	const [otpVerified, setOtpVerified] = useState(true);
+    // both landToken and verified are required 
+    const [landToken, setLandToken] = useState(0);
+    const [verifed, setVerified] = useState(false);
 
-	const [entityDocuments, setEntityDocuments] = useState<{
-		[key: string]: any;
-	}>({
-		aadharCard: "",
-		panCard: "",
-		addressProof: "",
-	});
 
-	const [newOwnerDetails, setNewOwnerDetails] = useState({
-		newOwnerName: "",
-		newOwnerAadharCardNumber: "",
-		newOwnerPanCardNumber: "",
-		newOwnerAddressProofA: "",
-		newOwnerAddressProofB: "",
-	});
+    const [documents, setDocuments] = useState<singleDocument[]>([]);
 
-	const tranferOwnerShipHandler = () => {
-		
-	};
+    const { drizzle } = useContext(CustomContext);
+    const drizzleMethods = drizzle.contracts.LandRegistry.methods;
 
-	return (
-		<>
-			<div>
-				<div className="flex flex-col flex-end">
-					<div className="w-full items-center justify-center ">
-						<h2 className="text-center underline underline-offset-4 text-primary  m-2">
-							Transfer Land
-						</h2>
-					</div>
-					<div className="form-control max-w-md">
-						<h3 className="ml-2">1) Verify Land Token</h3>
-						<input
-							type="text"
-							className="input input-bordered"
-							placeholder="Case ID"
-						/>
-						<div className="flex justify-end ">
-							<button
-								className="btn btn-primary btn-sm m-2"
-								onClick={() => setVerified(true)}
-							>
-								Click to Verify
-							</button>
-						</div>
-					</div>
-				</div>
-			</div>
-			{verifed && (
-				<>
-					<div>
-						<h4 className="ml-2">2) Buyer Details</h4>
-						<div className="flex shadow flex-col p-5">
-							{/* Name & Age */}
-							<div className="flex justify-around w-full">
-								<div className="form-control w-full max-w-xs">
-									<label className="label">
-										<span className="label-text">
-											Name
-											<span className="text-red-500">
-												{" *"}
-											</span>
-										</span>
-									</label>
-									<input
-										type="text"
-										placeholder="Type here"
-										className="input input-bordered w-full max-w-xs"
-										onChange={(e) => {
-											setNewOwnerDetails({
-												...newOwnerDetails,
-												newOwnerName: e.target.value,
-											});
-										}}
-									/>
-								</div>
+    const [otp, setOtp] = useState("");
+    const [otpVerified, setOtpVerified] = useState(true);
 
-								<div className="form-control w-full max-w-xs">
-									<label className="label">
-										<span className="label-text">
-											Aadhar Card Number
-											<span className="text-red-500">
-												{" *"}
-											</span>
-										</span>
-									</label>
-									<input
-										type="text"
-										placeholder="Type here"
-										className="input input-bordered w-full max-w-xs"
-										onChange={(e) => {
-											setNewOwnerDetails({
-												...newOwnerDetails,
-												newOwnerAadharCardNumber:
-													e.target.value,
-											});
-										}}
-									/>
-								</div>
-							</div>
+    const [newOwnerDetails, setNewOwnerDetails] = useState({
+        newOwnerName: "",
+        newOwnerAadhaarCardNumber: "",
+        newOwnerPanCardNumber: "",
+    });
 
-							{/* House & Street  */}
-							<div className="flex justify-around w-full">
-								<div className="form-control w-full max-w-xs">
-									<label className="label">
-										<span className="label-text">
-											Pan Number
-										</span>
-									</label>
-									<input
-										type="text"
-										className="input input-bordered w-full max-w-xs"
-										onChange={(e) => {
-											setNewOwnerDetails({
-												...newOwnerDetails,
-												newOwnerPanCardNumber:
-													e.target.value,
-											});
-										}}
-									/>
-								</div>
-								<div className="form-control w-full max-w-xs">
-									<label className="label">
-										<span className="label-text">
-											Address Proof A
-										</span>
-									</label>
-									<input
-										type="text"
-										className="input input-bordered w-full max-w-xs"
-										onChange={(e) => {
-											setNewOwnerDetails({
-												...newOwnerDetails,
-												newOwnerAddressProofA:
-													e.target.value,
-											});
-										}}
-									/>
-								</div>
-							</div>
 
-							{/* DOB & Gender  */}
-							<div className="flex justify-around w-full">
-								<div className="form-control w-full max-w-xs">
-									<label className="label">
-										<span className="label-text">
-											Address Proof B
-										</span>
-									</label>
-									<input
-										type="number"
-										placeholder="eg. 400001"
-										className="input input-bordered w-full max-w-xs"
-										onChange={(e) => {
-											setNewOwnerDetails({
-												...newOwnerDetails,
-												newOwnerAddressProofB:
-													e.target.value,
-											});
-										}}
-									/>
-								</div>
-							</div>
-						</div>
-					</div>
 
-					{/* <div>
+    const formSubmitHandler = async () => {
+        try {
+            const result = await axios.post("/property/transfer", {
+                propertyId: landToken,
+                newOwnerName: newOwnerDetails.newOwnerName,
+                newOwnerAadhaarCardNumber: newOwnerDetails.newOwnerAadhaarCardNumber,
+                newOwnerPanCardNumber: newOwnerDetails.newOwnerPanCardNumber,
+                documents: documents.map((doc) => {
+                    return {
+                        docId: doc.docId,
+                        name: doc.name,
+                        link: doc.link,
+                        hash: doc.hash,
+                        verifed: doc.verified,
+                    };
+                }),
+            })
+
+            customToast({
+                message: "Property transfer request sent",
+                icon: "success",
+            });
+
+            // clear form
+            setLandToken(0);
+            setNewOwnerDetails({
+                newOwnerName: "",
+                newOwnerAadhaarCardNumber: "",
+                newOwnerPanCardNumber: "",
+            })
+            setDocuments([]);
+
+        } catch (error: any) {
+            console.log("error", error)
+
+            customToast({
+                message: error.response.data.message,
+                icon: "error",
+            })
+        }
+
+    }
+
+    return (
+        <>
+            <div>
+                <div className="flex flex-col flex-end">
+                    <div className="w-full items-center justify-center ">
+                        <h2 className="text-center underline underline-offset-4 text-primary  m-2">
+                            Transfer Land
+                        </h2>
+                    </div>
+
+                    <div className="form-control max-w-md">
+                        <LandTokenVerify
+                            verified={verifed}
+                            setVerified={setVerified}
+                            landToken={landToken}
+                            setLandToken={setLandToken}
+                        />
+                    </div>
+                </div>
+            </div>
+            {verifed && (
+                <>
+                    <div>
+                        <h4 className="ml-2">2) Buyer Details (new owner details)</h4>
+                        <div className="flex shadow flex-col p-5">
+                            {/* Name & Age */}
+                            <div className="flex justify-around w-full">
+                                <div className="form-control w-full max-w-xs">
+                                    <label className="label">
+                                        <span className="label-text">
+                                            Owner Name
+                                            <span className="text-red-500">
+                                                {" *"}
+                                            </span>
+                                        </span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        placeholder="Type here"
+                                        className="input input-bordered w-full max-w-xs"
+                                        value={newOwnerDetails.newOwnerName}
+                                        onChange={(e) => {
+                                            setNewOwnerDetails(
+                                                produce(newOwnerDetails, (draft) => {
+                                                    draft.newOwnerName = e.target.value;
+                                                })
+                                            );
+                                        }}
+                                    />
+                                </div>
+
+                                <div className="form-control w-full max-w-xs">
+                                    <label className="label">
+                                        <span className="label-text">
+                                            Aadhar Card Number
+                                            <span className="text-red-500">
+                                                {" *"}
+                                            </span>
+                                        </span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        placeholder="Type here"
+                                        className="input input-bordered w-full max-w-xs"
+                                        value={newOwnerDetails.newOwnerAadhaarCardNumber}
+                                        onChange={(e) => {
+                                            setNewOwnerDetails(
+                                                produce(newOwnerDetails, (draft) => {
+                                                    draft.newOwnerAadhaarCardNumber = e.target.value;
+                                                })
+                                            );
+                                        }}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* House & Street  */}
+                            <div className="flex justify-around w-full">
+                                <div className="form-control w-full max-w-xs">
+                                    <label className="label">
+                                        <span className="label-text">
+                                            Pan Number
+                                        </span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        className="input input-bordered w-full max-w-xs"
+                                        value={newOwnerDetails.newOwnerPanCardNumber}
+                                        onChange={(e) => {
+                                            setNewOwnerDetails(
+                                                produce(newOwnerDetails, (draft) => {
+                                                    draft.newOwnerPanCardNumber = e.target.value;
+                                                })
+                                            );
+                                        }}
+                                    />
+                                </div>
+                                <div className="form-control w-full max-w-xs">
+                                    <label className="label">
+                                    </label>
+                                </div>
+
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                    <ImageTable
+                        documents={documents}
+                        setDocuments={setDocuments}
+                    />
+
+                    {/* <div>
 						<h4 className="ml-2">3) Buyer Documents</h4>
 						<div className="flex shadow flex-col p-5">
 							<div className="overflow-x-auto">
@@ -252,7 +263,7 @@ const EmployeeTranferLand = () => {
 						</div>
 					</div> */}
 
-					{/* <div className="form-control max-w-md">
+                    {/* <div className="form-control max-w-md">
 						<h6 className="ml-2">
 							4) Verify OTP of previous seller
 						</h6>
@@ -286,33 +297,25 @@ const EmployeeTranferLand = () => {
 						</div>
 					</div> */}
 
-					{otpVerified && (
-						<div className="flex justify-end w-full my-5">
-							<button
-								className="btn btn-primary"
-								onClick={(e) => {
-									tranferOwnerShipHandler();
-									setTimeout(() => {
-										customToast({
-											icon: "success",
-											message: "Land transfer initiated",
-										});
-									}, 1000);
-								}}
-							>
-								Tranfer Record
-								<FontAwesomeIcon
-									icon={faArrowRight}
-									className="mx-3"
-									size="1x"
-								/>
-							</button>
-						</div>
-					)}
-				</>
-			)}
-		</>
-	);
+                    {otpVerified && (
+                        <div className="flex justify-end w-full my-5">
+                            <button
+                                className="btn btn-primary"
+                                onClick={formSubmitHandler}
+                            >
+                                Tranfer Record
+                                <FontAwesomeIcon
+                                    icon={faArrowRight}
+                                    className="mx-3"
+                                    size="1x"
+                                />
+                            </button>
+                        </div>
+                    )}
+                </>
+            )}
+        </>
+    );
 };
 
 export default EmployeeTranferLand;

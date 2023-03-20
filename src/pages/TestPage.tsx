@@ -1,14 +1,20 @@
-import { useContext } from "react";
+import { ChangeEvent, useContext, useEffect, useState } from "react";
 import CustomContext from "../context/custom.context";
+import axios from 'axios';
+import useFileUpload from "../hooks/useFileUploader";
+import ImageTable from "../components/ImageTable";
+import { singleDocument } from "../types/type";
 
-const TestPage = () => {
-	const { drizzle, drizzleState, initialized } = useContext(CustomContext);
+function TestPage() {
 
-	console.log(
-		"ran testPage",
-		drizzleState.contracts["LandRegistry"].getRegisteredLandCount
-	);
-	return <div>Test route working </div>;
-};
+    const [documents, setDocuments] = useState<singleDocument[]>([]);
 
+
+    return (
+        <ImageTable
+            documents={documents}
+            setDocuments={setDocuments}
+        />
+    );
+}
 export default TestPage;

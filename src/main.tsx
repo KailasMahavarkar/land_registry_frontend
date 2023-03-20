@@ -5,7 +5,6 @@ import "./styles/main.scss";
 import "react-datepicker/dist/react-datepicker.css";
 import CustomContext from "./context/custom.context";
 import { useState } from "react";
-import defaultUsers from "./data/users.data";
 import configureStore from "./redux/configureStore";
 
 import landRegistery from "./solidity_contracts/LandRegistry.json";
@@ -29,109 +28,112 @@ import SearchBarToken from "./components/user/SearchBarToken";
 import Error from "./pages/Error";
 import TestPage from "./pages/TestPage";
 const { AccountData, ContractData } = newContextComponents;
+import { drizzleOptions, drizzleStore } from "./middleware/drizzleMw";
 
 const { store, persistor } = configureStore();
+const drizzle = new Drizzle(drizzleOptions, drizzleStore);
 
 const rootnode = ReactDOM.createRoot(
-	document.getElementById("root") as HTMLElement
+    document.getElementById("root") as HTMLElement
 );
 
 axios.defaults.baseURL = "http://localhost:2000";
 
 function App() {
-	const drizzle = new Drizzle({
-		contracts: [landRegistery as any],
-	});
 
-	const [theme, setTheme] = useState<"light" | "dark">("light");
+    const [theme, setTheme] = useState<"light" | "dark">("light");
 
-	const defaultProfile = {
-		_id: "",
-		username: "",
-		role: "employee",
-		fullname: "",
-		email: "",
-		apikey: "",
-		datejoined: "",
-		status: "active",
-	};
+    const defaultProfile = {
+        _id: "",
+        username: "",
+        role: "employee",
+        fullname: "",
+        email: "",
+        apikey: "",
+        datejoined: "",
+        status: "active",
+    };
 
-	const [profile, setProfile] = useState<profileType>(
-		defaultProfile as profileType
-	);
-	const [users, setUsers] = useState<singleUserType[]>(defaultUsers);
+    const [profile, setProfile] = useState<profileType>(
+        defaultProfile as profileType
+    );
+    const [users, setUsers] = useState<singleUserType[]>([]);
 
-	useEffectAsync(() => {
-		if (localStorage.getItem("theme")) {
-			setTheme(localStorage.getItem("theme") as "light" | "dark");
-		}
-	}, []);
+    useEffectAsync(() => {
+        if (localStorage.getItem("theme")) {
+            setTheme(localStorage.getItem("theme") as "light" | "dark");
+        }
+    }, []);
 
-	return (
-		<DrizzleContext.Provider drizzle={drizzle}>
-			<BrowserRouter>
-				<DrizzleContext.Consumer>
-					{(drizzleContext: any) => {
-						const { drizzle, drizzleState, initialized } =
-							drizzleContext;
-						if (!initialized) {
-							return "Loading...";
-						}
-						console.log("drizzle ", drizzle);
-						console.log("drizzle state ", drizzleState);
-						return (
-							<>
-								<CustomContext.Provider
-									value={{
-										theme,
-										setTheme,
-										users: users,
-										setUsers: setUsers,
-										profile: profile,
-										setProfile: setProfile,
+    return (
+        <Provider store={store}>
+            <PersistGate loading={null} persistor={persistor}>
+                <DrizzleContext.Provider drizzle={drizzle}>
+                    <BrowserRouter>
+                        <DrizzleContext.Consumer>
+                            {(drizzleContext: any) => {
+                                const { drizzle, drizzleState, initialized } =
+                                    drizzleContext;
+                                if (!initialized) {
+                                    return "Loading...";
+                                }
+                                console.log("drizzle ", drizzle);
+                                console.log("drizzle state ", drizzleState);
+                                return (
+                                    <>
+                                        <CustomContext.Provider
+                                            value={{
+                                                theme,
+                                                setTheme,
+                                                users: users,
+                                                setUsers: setUsers,
+                                                profile: profile,
+                                                setProfile: setProfile,
 
-										drizzle,
-										drizzleState,
-										initialized,
-									}}
-								>
-									<Routes>
-										<Route index element={<Home />} />
-										<Route
-											path="search/:token"
-											element={<SearchBarToken />}
-										/>
+                                                drizzle,
+                                                drizzleState,
+                                                initialized,
+                                            }}
+                                        >
+                                            <Routes>
+                                                <Route index element={<Home />} />
+                                                <Route
+                                                    path="search/:token"
+                                                    element={<SearchBarToken />}
+                                                />
 
-										<Route
-											path="login"
-											element={<Login />}
-										/>
+                                                <Route
+                                                    path="login"
+                                                    element={<Login />}
+                                                />
 
-										<Route
-											path="dashboard"
-											element={<EmployeeDashboard />}
-										/>
+                                                <Route
+                                                    path="dashboard"
+                                                    element={<EmployeeDashboard />}
+                                                />
 
-										<Route
-											path="admin-dashboard"
-											element={<AdminDashboard />}
-										/>
+                                                <Route
+                                                    path="admin-dashboard"
+                                                    element={<AdminDashboard />}
+                                                />
 
-										<Route
-											path="test"
-											element={<TestPage />}
-										/>
+                                                <Route
+                                                    path="test"
+                                                    element={<TestPage />}
+                                                />
 
-										<Route path="*" element={<Error />} />
-									</Routes>
-								</CustomContext.Provider>
-							</>
-						);
-					}}
-				</DrizzleContext.Consumer>
-			</BrowserRouter>
-		</DrizzleContext.Provider>
-	);
+                                                <Route path="*" element={<Error />} />
+                                            </Routes>
+                                        </CustomContext.Provider>
+                                    </>
+                                );
+                            }}
+                        </DrizzleContext.Consumer>
+                    </BrowserRouter>
+                </DrizzleContext.Provider>
+            </PersistGate>
+        </Provider>
+    );
 }
 
 rootnode.render(<App />);

@@ -1,615 +1,554 @@
-import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import produce from "immer";
-import { useContext, useEffect, useState } from "react";
-import DatePicker from "react-datepicker";
-import Swal from "sweetalert2";
-import CustomContext from "../../context/custom.context";
+import { ChangeEvent, useState } from "react";
+import axios from "axios";
+import customToast from "../../toast";
+import { singleDocument } from "../../types/type";
+import ImageTable from "../ImageTable";
+
+const states = [
+    "Andhra Pradesh",
+    "Arunachal Pradesh",
+    "Assam",
+    "Bihar",
+    "Chaattisgarh",
+    "Goa",
+    "Gujarat",
+    "Haryana",
+    "Himachal Pradesh",
+    "Jharkhand",
+    "Karnataka",
+    "Kerala",
+    "Madhya Pradesh",
+    "Maharashtra",
+    "Manipur",
+    "Meghalaya",
+    "Mizoram",
+    "Nagaland",
+    "Odisha",
+    "Punjab",
+    "Rajasthan",
+    "Sikkim",
+    "Tamil Nadu",
+    "Telangana",
+    "Tripura",
+    "Uttarakhand",
+    "Uttar Pradesh",
+    "West Bengal",
+];
+
+interface propertyType {
+    propertyHouseNumber: string;
+    propertyStreetName: string;
+    propertyType: string;
+    propertyWidth: number;
+    propertyLength: number;
+    propertyPincode: number;
+    propertyState: string;
+    propertyVillage: string;
+    propertyDistrict: string;
+    propertyTaluka: string;
+    ownerName: string;
+    aadharCardNumber: string;
+    panCardNumber: string;
+    transfered: boolean;
+    transferedTo: number;
+
+    transferedFrom: number[];
+    propertySplitLandId: number[];
+    surveyNumber: number;
+    subSurveyNumber: number;
+
+    createdOn: string;
+}
+
+const propertyDefault = {
+    propertyHouseNumber: "",
+    propertyStreetName: "",
+    propertyType: "residential",
+    propertyWidth: 0,
+    propertyLength: 0,
+    propertyPincode: 0,
+    propertyState: "",
+    propertyVillage: "",
+    propertyDistrict: "",
+    propertyTaluka: "",
+
+    // owner details
+    ownerName: "",
+    aadharCardNumber: "",
+    panCardNumber: "",
+    // transfer details (if any)
+    transfered: false,
+    transferedTo: 0,
+    transferedFrom: [],
+    propertySplitLandId: [],
+    // ownership details
+    surveyNumber: 0,
+    subSurveyNumber: 0,
+
+
+    createdOn: new Date().toISOString(),
+}
 
 const EmployeeNewLandRegistration = () => {
-	const { drizzle, drizzleState } = useContext(CustomContext);
-	const [landDocuments, setLandDocuments] = useState<{
-		[key: string]: any;
-	}>({
-		saleAgreement: "",
-		saleDeed: "",
-		digitalROR: "",
-		surveyPlan: "",
-	});
+    const [documents, setDocuments] = useState<singleDocument[]>([]);
+    const [property, setProperty] = useState<propertyType>(propertyDefault);
 
-	const [landImages, setLandImages] = useState<any>([]);
+    const formSubmitHandler = async (e: any) => {
+        e.preventDefault();
+        try {
+            await axios.post("/property/register", {
+                ...property,
+                documents: documents.map((doc) => {
+                    return {
+                        name: doc.name,
+                        docId: doc.docId,
+                        link: doc.link,
+                        hash: doc.hash,
+                        verified: doc.verified,
+                    };
+                })
+            });
 
-	const states = [
-		"Andhra Pradesh",
-		"Arunachal Pradesh",
-		"Assam",
-		"Bihar",
-		"Chaattisgarh",
-		"Goa",
-		"Gujarat",
-		"Haryana",
-		"Himachal Pradesh",
-		"Jharkhand",
-		"Karnataka",
-		"Kerala",
-		"Madhya Pradesh",
-		"Maharashtra",
-		"Manipur",
-		"Meghalaya",
-		"Mizoram",
-		"Nagaland",
-		"Odisha",
-		"Punjab",
-		"Rajasthan",
-		"Sikkim",
-		"Tamil Nadu",
-		"Telangana",
-		"Tripura",
-		"Uttarakhand",
-		"Uttar Pradesh",
-		"West Bengal",
-	];
+            customToast({
+                message: "Property Registration Applied",
+                icon: "success",
+            });
+            setProperty(propertyDefault);
+            setDocuments([]);
+        } catch (err) {
+            customToast({
+                message: "Property Registration Error",
+                icon: "error",
+            });
+        }
+    };
 
-	const [entityDocuments, setEntityDocuments] = useState<{
-		[key: string]: any;
-	}>({
-		aadharCard: "",
-		panCard: "",
-		addressProof: "",
-		addressProof2: "",
-	});
+    const [termsAndConditions, setTermsAndConditions] = useState(true);
 
-	const [property, setProperty] = useState({
-		propertyHouseNumber: "",
-		propertyStreetName: "",
-		propertyType: "",
-		propertyArea: 0,
-		propertyPincode: 0,
-		propertyState: "",
-		propertyVillage: "",
-		propertyDistrict: "",
-		propertyTaluka: "",
+    return (
+        <>
+            <form onSubmit={formSubmitHandler}>
+                <div className="w-full items-center justify-center ">
+                    <h2 className="text-center underline underline-offset-4 text-primary  m-2">
+                        New Property Registration
+                    </h2>
+                    {/* <pre>{JSON.stringify(property, null, 2)}</pre> */}
+                </div>
+                {/* User Details */}
+                <div>
+                    <h4 className="ml-2">1) User Details</h4>
+                    <div className="flex shadow flex-col p-5">
+                        {/* Name & Age */}
+                        <div className="flex justify-around w-full">
+                            <div className="form-control w-full max-w-xs">
+                                <label className="label">
+                                    <span className="label-text">
+                                        Name
+                                        <span className="text-red-500">{" *"}</span>
+                                    </span>
+                                </label>
+                                <input
+                                    type="text"
+                                    placeholder="Type here"
+                                    value={property.ownerName}
+                                    className="input input-bordered w-full max-w-xs"
+                                    onChange={(e) => {
+                                        setProperty({
+                                            ...property,
+                                            ownerName: e.target.value,
+                                        });
+                                    }}
+                                />
+                            </div>
 
-		// owner details
-		ownerName: "",
-		aadharCardNumber: "",
-		panCardNumber: "",
-		addressProofA: "",
-		addressProofB: "",
-		// transfer details (if any)
-		transfered: false,
-		transferedTo: 0,
-		transferedFrom: [],
-		propertySplitLandId: [],
-		// ownership details
-		surveyNumber: 4096,
-		subSurveyNumber: 4096,
-		createdOn: "15-3-23",
-	});
+                            <div className="form-control w-full max-w-xs">
+                                <label className="label">
+                                    <span className="label-text">
+                                        Aadhar Card Number
+                                        <span className="text-red-500">{" *"}</span>
+                                    </span>
+                                </label>
+                                <input
+                                    type="text"
+                                    placeholder="Type here"
+                                    value={property.aadharCardNumber}
+                                    className="input input-bordered w-full max-w-xs"
+                                    onChange={(e) => {
+                                        setProperty({
+                                            ...property,
+                                            aadharCardNumber: e.target.value,
+                                        });
+                                    }}
+                                />
+                            </div>
+                        </div>
 
-	// [
-	// 	"JK house",
-	// 	"route 66",
-	// 	"residential",
-	// 	800,
-	// 	400070,
-	// 	"maharashtra",
-	// 	"mumbai",
-	// 	"mumbai",
-	// 	"mumbai",
-	// 	"kailas",
-	// 	"3782",
-	// 	"DMN",
-	// 	"light bill",
-	// 	"ration card",
-	// 	false,
-	// 	5666736,
-	// 	[],
-	// 	[],
-	// 	2048,
-	// 	2048,
-	// 	"15-3-23",
-	// ];
+                        {/* Pan card */}
+                        <div className="flex justify-around w-full">
+                            <div className="form-control w-full max-w-xs">
+                                <label className="label">
+                                    <span className="label-text">
+                                        Pan card Number
+                                        <span className="text-red-500">{" *"}</span>
+                                    </span>
+                                </label>
+                                <input
+                                    type="text"
+                                    placeholder="Type here"
+                                    value={property.panCardNumber}
+                                    className="input input-bordered w-full max-w-xs"
+                                    onChange={(e) => {
+                                        setProperty({
+                                            ...property,
+                                            panCardNumber: e.target.value,
+                                        });
+                                    }}
+                                />
+                            </div>
+                            <div className="form-control w-full max-w-xs">
+                                <label className="label">
+                                </label>
+                            </div>
 
-	const registerPropertyHandler = () => {
-		drizzle.contracts.LandRegistry.methods
-			.registerNewProperty(property)
-			.send();
-	};
+                        </div>
+                    </div>
+                </div>
+                {/* Property Details */}
+                <h4 className="ml-2 mt-5 my-2">2) Property Details</h4>
+                <div className="flex shadow flex-col p-5">
+                    {/* House & Street  */}
+                    <div className="flex justify-around w-full">
+                        <div className="form-control w-full max-w-xs">
+                            <label className="label">
+                                <span className="label-text">House Number</span>
+                            </label>
+                            <input
+                                type="text"
+                                className="input input-bordered w-full max-w-xs"
+                                required={true}
+                                value={property.propertyHouseNumber}
+                                onChange={(e) => {
+                                    setProperty({
+                                        ...property,
+                                        propertyHouseNumber: e.target.value,
+                                    });
+                                }}
+                            />
+                        </div>
+                        <div className="form-control w-full max-w-xs">
+                            <label className="label">
+                                <span className="label-text">Street Name</span>
+                            </label>
+                            <input
+                                type="text"
+                                required={true}
+                                value={property.propertyStreetName}
+                                className="input input-bordered w-full max-w-xs"
+                                onChange={(e) => {
+                                    setProperty({
+                                        ...property,
+                                        propertyStreetName: e.target.value,
+                                    });
+                                }}
+                            />
+                        </div>
+                    </div>
 
-	const [termsAndConditions, setTermsAndConditions] = useState(true);
-	const [fullverified, setFullverified] = useState(true);
+                    {/* State */}
+                    <div className="flex justify-around w-full">
+                        <div className="form-control w-full max-w-xs">
+                            <label className="label">
+                                <span className="label-text">
+                                    State
+                                    <span className="text-red-500">{" *"}</span>
+                                </span>
+                            </label>
+                            <select
+                                required={true}
+                                value={property.propertyState}
+                                onChange={(e) => {
+                                    setProperty({
+                                        ...property,
+                                        propertyState: e.target.value,
+                                    });
+                                }}
+                                className="select  select-bordered w-full max-w-xs"
+                            >
+                                {states.map((state) => (
+                                    <option key={state}>{state}</option>
+                                ))}
+                            </select>
+                        </div>
 
-	return (
-		<>
-			<div className="w-full items-center justify-center ">
-				<h2 className="text-center underline underline-offset-4 text-primary  m-2">
-					New Property Registration
-				</h2>
-			</div>
-			{/* User Details */}
-			<div>
-				<h4 className="ml-2">1) User Details</h4>
-				<div className="flex shadow flex-col p-5">
-					{/* Name & Age */}
-					<div className="flex justify-around w-full">
-						<div className="form-control w-full max-w-xs">
-							<label className="label">
-								<span className="label-text">
-									Name
-									<span className="text-red-500">{" *"}</span>
-								</span>
-							</label>
-							<input
-								type="text"
-								placeholder="Type here"
-								className="input input-bordered w-full max-w-xs"
-								onChange={(e) => {
-									setProperty(
-										produce(property, (draft) => {
-											draft.ownerName = e.target.value;
-										})
-									);
-								}}
-							/>
-						</div>
+                        <div className="form-control w-full max-w-xs">
+                            <label className="label">
+                                <span className="label-text">
+                                    Property Type
+                                    <span className="text-red-500">{" *"}</span>
+                                </span>
+                            </label>
+                            <select
+                                className="select  select-bordered w-full max-w-xs"
+                                required={true}
+                                value={property.propertyType}
+                                onChange={(e) => {
+                                    setProperty({
+                                        ...property,
+                                        propertyType: e.target.value,
+                                    });
+                                }}
+                            >
+                                <option>residential</option>
+                                <option>commercial</option>
+                                <option>industrial</option>
+                            </select>
+                        </div>
+                    </div>
 
-						<div className="form-control w-full max-w-xs">
-							<label className="label">
-								<span className="label-text">
-									Aadhar Card Number
-									<span className="text-red-500">{" *"}</span>
-								</span>
-							</label>
-							<input
-								type="text"
-								placeholder="Type here"
-								className="input input-bordered w-full max-w-xs"
-								onChange={(e) => {
-									setProperty(
-										produce(property, (draft) => {
-											draft.aadharCardNumber =
-												e.target.value;
-										})
-									);
-								}}
-							/>
-						</div>
-					</div>
-				</div>
-			</div>
-			{/* Property Details */}
-			<div>
-				<h4 className="ml-2">2) Property Details</h4>
-				<div className="flex shadow flex-col p-5">
-					{/* House & Street  */}
-					<div className="flex justify-around w-full">
-						<div className="form-control w-full max-w-xs">
-							<label className="label">
-								<span className="label-text">House Number</span>
-							</label>
-							<input
-								type="text"
-								className="input input-bordered w-full max-w-xs"
-								onChange={(e) => {
-									setProperty({
-										...property,
-										propertyHouseNumber: e.target.value,
-									});
-								}}
-							/>
-						</div>
-						<div className="form-control w-full max-w-xs">
-							<label className="label">
-								<span className="label-text">Street Name</span>
-							</label>
-							<input
-								type="text"
-								className="input input-bordered w-full max-w-xs"
-								onChange={(e) => {
-									setProperty({
-										...property,
-										propertyStreetName: e.target.value,
-									});
-								}}
-							/>
-						</div>
-					</div>
+                    {/* Pincode & Taluka  */}
+                    <div className="flex justify-around w-full">
+                        <div className="form-control w-full max-w-xs">
+                            <label className="label">
+                                <span className="label-text">Pincode</span>
+                            </label>
+                            <input
+                                type="number"
+                                placeholder="eg. 400001"
+                                required={true}
+                                value={property.propertyPincode}
+                                className="input input-bordered w-full max-w-xs"
+                                onChange={(e) => {
+                                    setProperty({
+                                        ...property,
+                                        propertyPincode: Number(e.target.value),
+                                    });
+                                }}
+                            />
+                        </div>
+                        <div className="form-control w-full max-w-xs">
+                            <label className="label">
+                                <span className="label-text">Taluka</span>
+                            </label>
+                            <input
+                                type="string"
+                                placeholder="eg. Mumbai"
+                                required={true}
+                                value={property.propertyTaluka}
+                                className="input input-bordered w-full max-w-xs"
+                                onChange={(e) => {
+                                    setProperty({
+                                        ...property,
+                                        propertyTaluka: e.target.value,
+                                    });
+                                }}
+                            />
+                        </div>
+                    </div>
 
-					{/* State */}
-					<div className="flex justify-around w-full">
-						<div className="form-control w-full max-w-xs">
-							<label className="label">
-								<span className="label-text">
-									State
-									<span className="text-red-500">{" *"}</span>
-								</span>
-							</label>
-							<select className="select  select-bordered w-full max-w-xs">
-								{states.map((state) => (
-									<option key={state}>{state}</option>
-								))}
-							</select>
-						</div>
+                    <div className="flex justify-around w-full">
+                        <div className="form-control w-full max-w-xs">
+                            <label className="label">
+                                <span className="label-text">
+                                    Property District
+                                </span>
+                            </label>
+                            <input
+                                type="text"
+                                defaultValue="mumbai"
+                                placeholder="Type here"
+                                required={true}
+                                value={property.propertyDistrict}
+                                className="input input-bordered w-full max-w-xs"
+                                onChange={(e) => {
+                                    setProperty({
+                                        ...property,
+                                        propertyDistrict: e.target.value,
+                                    });
+                                }}
+                            />
+                        </div>
+                        <div className="form-control w-full max-w-xs">
+                            <label className="label">
+                                <span className="label-text">village</span>
+                            </label>
+                            <input
+                                type="string"
+                                placeholder="eg. Mumbai"
+                                required={true}
+                                value={property.propertyVillage}
+                                className="input input-bordered w-full max-w-xs"
+                                onChange={(e) => {
+                                    setProperty({
+                                        ...property,
+                                        propertyVillage: e.target.value,
+                                    });
+                                }}
+                            />
+                        </div>
+                    </div>
 
-						<div className="form-control w-full max-w-xs">
-							<label className="label">
-								<span className="label-text">
-									Property Type
-									<span className="text-red-500">{" *"}</span>
-								</span>
-							</label>
-							<select
-								className="select  select-bordered w-full max-w-xs"
-								onChange={(e) => {
-									setProperty({
-										...property,
-										propertyType: e.target.value,
-									});
-								}}
-							>
-								<option>residential</option>
-								<option>commercial</option>
-								<option>industrial</option>
-							</select>
-						</div>
-					</div>
+                    {/* Length & Width */}
+                    <div className="flex justify-around w-full">
+                        <div className="form-control w-full max-w-xs">
+                            <label className="label">
+                                <span className="label-text">
+                                    Property Length (in feets)
+                                    <span className="text-red-500">{" *"}</span>
+                                </span>
+                            </label>
+                            <input
+                                type="number"
+                                placeholder="300"
+                                required={true}
+                                value={property.propertyLength}
+                                className="input input-bordered w-full max-w-xs"
+                                onChange={(e) => {
+                                    setProperty({
+                                        ...property,
+                                        propertyLength: Number(e.target.value),
+                                    });
+                                }}
+                            />
+                        </div>
 
-					{/* Area & Dimension */}
-					<div className="flex justify-around w-full">
-						<div className="form-control w-full max-w-xs">
-							<label className="label">
-								<span className="label-text">
-									Property Area(sq.ft)
-									<span className="text-red-500">{" *"}</span>
-								</span>
-							</label>
-							<input
-								type="number"
-								placeholder="300"
-								className="input input-bordered w-full max-w-xs"
-								onChange={(e) => {
-									setProperty({
-										...property,
-										propertyArea: Number(e.target.value),
-									});
-								}}
-							/>
-						</div>
+                        <div className="form-control w-full max-w-xs">
+                            <label className="label">
+                                <span className="label-text">
+                                    Property Width (in feets)
+                                    <span className="text-red-500">{" *"}</span>
+                                </span>
+                            </label>
+                            <input
+                                type="number"
+                                placeholder="300"
+                                required={true}
+                                value={property.propertyWidth}
+                                className="input input-bordered w-full max-w-xs"
+                                onChange={(e) => {
+                                    setProperty({
+                                        ...property,
+                                        propertyWidth: Number(e.target.value),
+                                    });
+                                }}
+                            />
+                        </div>
+                    </div>
 
-						<div className="form-control w-full max-w-xs">
-							<label className="label">
-								<span className="label-text">
-									Property District
-									<span className="text-red-500">{" *"}</span>
-								</span>
-							</label>
-							<input
-								type="text"
-								defaultValue="mumbai"
-								placeholder="Type here"
-								className="input input-bordered w-full max-w-xs"
-								onChange={(e) => {
-									setProperty({
-										...property,
-										propertyDistrict: e.target.value,
-									});
-								}}
-							/>
-						</div>
-					</div>
+                    {/* Survey Number & Sub Survey Number */}
+                    <div className="flex justify-around w-full">
+                        <div className="form-control w-full max-w-xs">
+                            <label className="label">
+                                <span className="label-text">
+                                    Survey Number
+                                    <span className="text-red-500">{" *"}</span>
+                                </span>
+                            </label>
+                            <input
+                                type="number"
+                                placeholder="300"
+                                required={true}
+                                value={property.surveyNumber}
+                                className="input input-bordered w-full max-w-xs"
+                                onChange={(e) => {
+                                    setProperty({
+                                        ...property,
+                                        surveyNumber: Number(e.target.value),
+                                    });
+                                }}
+                            />
+                        </div>
 
-					{/* Pincode & Taluka  */}
-					<div className="flex justify-around w-full">
-						<div className="form-control w-full max-w-xs">
-							<label className="label">
-								<span className="label-text">Pincode</span>
-							</label>
-							<input
-								type="number"
-								placeholder="eg. 400001"
-								className="input input-bordered w-full max-w-xs"
-								onChange={(e) => {
-									setProperty({
-										...property,
-										propertyPincode: Number(e.target.value),
-									});
-								}}
-							/>
-						</div>
-						<div className="form-control w-full max-w-xs">
-							<label className="label">
-								<span className="label-text">Taluka</span>
-							</label>
-							<input
-								type="number"
-								placeholder="eg. Mumbai"
-								className="input input-bordered w-full max-w-xs"
-								onChange={(e) => {
-									setProperty({
-										...property,
-										propertyTaluka: e.target.value,
-									});
-								}}
-							/>
-						</div>
-					</div>
-				</div>
-			</div>
-			{/* Land Related Details */}
-			{/* <div>
-				<h4 className="ml-2">3) Land Related Documents</h4>
-				<div className="flex shadow flex-col p-5">
-					<div className="overflow-x-auto">
-						<table className="table w-full">
-							<thead>
-								<tr>
-									<th></th>
-									<th>Name</th>
-									<th>Uploader</th>
-									<th>Preview</th>
-								</tr>
-							</thead>
-							<tbody>
-								{Object.keys(landDocuments).map(
-									(doc, index) => {
-										return (
-											<tr key={index}>
-												<td>{index + 1}</td>
-												<td>{doc}</td>
-												<td>
-													<input
-														type="file"
-														className="custom-file-input"
-														onChange={(e) => {
-															setLandDocuments(
-																// prettier-ignore
-																produce(landDocuments, (draft: any) => {
+                        <div className="form-control w-full max-w-xs">
+                            <label className="label">
+                                <span className="label-text">
+                                    Sub Survey Number
+                                    <span className="text-red-500">{" *"}</span>
+                                </span>
+                            </label>
+                            <input
+                                type="number"
+                                placeholder="300"
+                                required={true}
+                                value={property.subSurveyNumber}
+                                className="input input-bordered w-full max-w-xs"
+                                onChange={(e) => {
+                                    setProperty({
+                                        ...property,
+                                        subSurveyNumber: Number(e.target.value),
+                                    });
+                                }}
+                            />
+                        </div>
+                    </div>
 
-                                                                // allow only image files
-                                                                if (e.target.files && e.target.files[0].type.includes('image')) {
-                                                                    draft[doc] = e.target.files[0];
-                                                                }
-                                                            })
-															);
-														}}
-													/>
-												</td>
-												<td>
-													{landDocuments[doc] ? (
-														<img
-															className="w-20 h-20"
-															src={URL.createObjectURL(
-																landDocuments[
-																	doc
-																]
-																	? landDocuments[
-																			doc
-																	  ]
-																	: ""
-															)}
-															alt="preview"
-														/>
-													) : (
-														<p>No file selected</p>
-													)}
-												</td>
-											</tr>
-										);
-									}
-								)}
-							</tbody>
-						</table>
-					</div>
-				</div>
-			</div> */}
-			{/* Land Images */}
-			{/* <div>
-				<h4 className="ml-2">3) Land Images</h4>
-				<div className="flex justify-center">
-					<input
-						type="file"
-						className="custom-file-input w-full"
-						multiple={true}
-						onChange={(e: any) => {
-							if (e.target.files) {
-								for (
-									let i = 0;
-									i < e.target.files.length;
-									i++
-								) {
-									setLandImages((prev: any) => [
-										...prev,
-										e.target.files[i],
-									]);
-								}
-							}
-						}}
-					/>
-				</div>
-				{landImages.length > 0 && (
-					<div className="flex shadow flex-col p-5">
-						<div className="grid grid-cols-3 gap-4">
-							{landImages.map((image: any, index: any) => {
-								return (
-									<div
-										key={index}
-										className="flex border-2 items-center justify-center "
-									>
-										<img
-											className="max-w-[200px] max-h-[300px]"
-											src={URL.createObjectURL(image)}
-											alt="preview"
-										/>
-									</div>
-								);
-							})}
-						</div>
-					</div>
-				)}
-			</div> */}
-			{/* Owner Related Documents */}
-			{/* <div>
-				<h4 className="ml-2">4) Owner Related Documents</h4>
-				<div className="flex shadow flex-col p-5">
-					<div className="overflow-x-auto">
-						<table className="table w-full">
-							<thead>
-								<tr>
-									<th></th>
-									<th>Name</th>
-									<th>Uploader</th>
-									<th>Preview</th>
-								</tr>
-							</thead>
-							<tbody>
-								{Object.keys(entityDocuments).map(
-									(doc, index) => {
-										return (
-											<tr key={index}>
-												<td>{index + 1}</td>
-												<td>{doc}</td>
-												<td>
-													<input
-														type="file"
-														className="custom-file-input"
-														onChange={(e) => {
-															setEntityDocuments(
-																// prettier-ignore
-																produce(entityDocuments, (draft: any) => {
+                    {/* Area */}
+                    <div className="flex justify-around w-full">
+                        <div className="form-control w-full max-w-xs">
+                            <label className="label">
+                                <span className="label-text">
+                                    Property Area (sq.ft)
+                                    <span className="text-red-500">{" *"}</span>
+                                </span>
+                            </label>
+                            <input
+                                type="number"
+                                value={
+                                    property.propertyWidth *
+                                    property.propertyLength
+                                }
+                                className="input input-bordered w-full max-w-xs"
+                                disabled={true}
+                            />
+                        </div>
+                        <div className="form-control w-full max-w-xs">
+                            <label className="label">
 
-                                                                // allow only image files
-                                                                if (e.target.files && e.target.files[0].type.includes('image')) {
-                                                                    draft[doc] = e.target.files[0];
-                                                                }
-                                                            })
-															);
-														}}
-													/>
-												</td>
-												<td>
-													{entityDocuments[doc] ? (
-														<img
-															className="w-20 h-20"
-															src={URL.createObjectURL(
-																entityDocuments[
-																	doc
-																]
-																	? entityDocuments[
-																			doc
-																	  ]
-																	: ""
-															)}
-															alt="preview"
-														/>
-													) : (
-														<p>No file selected</p>
-													)}
-												</td>
-											</tr>
-										);
-									}
-								)}
-							</tbody>
-						</table>
-					</div>
-				</div>
-			</div> */}
-			{/* Land Related Details */}
-			<div>
-				<h4 className="ml-2">5) Agree terms and conditions </h4>
-				<div className="flex shadow flex-col p-5">
-					<div className="form-control">
-						<label className="label">
-							<span className="label-text">Accept / Deny</span>
-						</label>
-						<input
-							type="checkbox"
-							className="checkbox"
-							checked={termsAndConditions}
-							onChange={(e) =>
-								setTermsAndConditions(e.target.checked)
-							}
-						/>
-						<span className="checkbox-mark"></span>
-					</div>
-				</div>
-				<div className="flex justify-end w-full my-5">
-					<button
-						className="btn btn-primary"
-						disabled={!termsAndConditions}
-						onClick={() => {
+                            </label>
 
-                            registerPropertyHandler();
-							Swal.fire({
-								icon: "info",
-								title: "Area Verification Request Submitted",
-								text: "please wait 30 days for approval, our team will contact you soon for land verification",
-								footer: "",
-							});
-						}}
-					>
-						Submit For Area Verification
-						<FontAwesomeIcon
-							icon={faArrowRight}
-							className="mx-3"
-							size="1x"
-						/>
-					</button>
-				</div>
-			</div>
+                        </div>
+                    </div>
 
-			<div>
-				{(termsAndConditions || true) && (
-					<>
-						<h4 className="ml-2">
-							5) Everything has been verified and found to be
-							correct{" "}
-						</h4>
-						<div className="flex shadow flex-col p-5">
-							<div className="form-control">
-								<input
-									type="checkbox"
-									className="toggle"
-									checked={fullverified}
-									onChange={(e) =>
-										setFullverified(e.target.checked)
-									}
-								/>
-								<span className="checkbox-mark"></span>
-							</div>
-						</div>
-					</>
-				)}
-				{termsAndConditions && fullverified && (
-					<div className="flex justify-end w-full my-5">
-						<button
-							className="btn btn-success"
-							onClick={() => {
-								setFullverified(true);
+                </div>
+                {/* Land Related Details */}
+                <div>
+                    <h4 className="ml-2 my-3">3) Land Related Documents</h4>
+                    <div className="flex shadow flex-col p-5">
+                        <ImageTable
+                            documents={documents}
+                            setDocuments={setDocuments}
+                        />
+                    </div>
+                </div>
 
-								Swal.fire({
-									icon: "info",
-									title: "Your Land has been added to blockchain",
-									text: "",
-									footer: "",
-								});
-							}}
-						>
-							Submit To Blockchain
-							<FontAwesomeIcon
-								icon={faArrowRight}
-								className="mx-3"
-								size="1x"
-							/>
-						</button>
-					</div>
-				)}
-			</div>
-		</>
-	);
+                {/* Terms and conditions */}
+                <div>
+                    <h4 className="ml-2 my-2">4) Agree terms and conditions </h4>
+                    <div className="flex shadow flex-col p-5">
+                        <div className="form-control">
+                            <input
+                                type="checkbox"
+                                className="checkbox"
+                                checked={termsAndConditions}
+                                onChange={(e) =>
+                                    setTermsAndConditions(e.target.checked)
+                                }
+                            />
+                            <span className="checkbox-mark"></span>
+                        </div>
+                    </div>
+                    <div className="flex justify-end w-full my-5">
+                        <input
+                            type="submit"
+                            value="Submit for Admin Approval "
+                            className="btn btn-primary"
+                            disabled={!termsAndConditions}
+                        />
+                    </div>
+                </div>
+            </form >
+        </>
+    );
 };
-
-
 
 export default EmployeeNewLandRegistration;

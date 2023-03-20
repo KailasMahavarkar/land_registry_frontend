@@ -18,6 +18,7 @@ specifiers:
   '@types/react-router-dom': ^5.3.3
   '@types/redux': ^3.6.0
   '@types/redux-logger': ^3.0.9
+  '@types/treeify': ^1.0.0
   '@vitejs/plugin-react': ^2.2.0
   autoprefixer: ^10.4.13
   axios: ^0.27.2
@@ -40,6 +41,7 @@ specifiers:
   sweetalert2: ^11.6.14
   tailwindcss: ^3.2.2
   theme-change: ^2.2.0
+  treeify: ^1.1.0
   typescript: ^4.6.4
   vite: ^3.2.0
 
@@ -69,6 +71,7 @@ dependencies:
   sass: 1.56.1
   sweetalert2: 11.6.14
   theme-change: 2.2.0
+  treeify: 1.1.0
 
 devDependencies:
   '@reduxjs/toolkit': 1.9.0_k4ae6lp43ej6mezo3ztvx6pykq
@@ -79,6 +82,7 @@ devDependencies:
   '@types/react-router-dom': 5.3.3
   '@types/redux': 3.6.0
   '@types/redux-logger': 3.0.9
+  '@types/treeify': 1.0.0
   '@vitejs/plugin-react': 2.2.0_vite@3.2.4
   autoprefixer: 10.4.13_postcss@8.4.19
   postcss: 8.4.19
@@ -893,6 +897,10 @@ packages:
     dependencies:
       '@types/node': 18.11.9
     dev: false
+
+  /@types/treeify/1.0.0:
+    resolution: {integrity: sha512-ONpcZAEYlbPx4EtJwfTyCDQJGUpKf4sEcuySdCVjK5Fj/3vHp5HII1fqa1/+qrsLnpYELCQTfVW/awsGJePoIg==}
+    dev: true
 
   /@types/use-sync-external-store/0.0.3:
     resolution: {integrity: sha512-EwmlvuaxPNej9+T4v5AuBPJa2x2UOJVdjCtDHgcDqitUeOtjnJKJ+apYjVcAoBEMjKW1VVFGZLUb5+qqa09XFA==}
@@ -3815,6 +3823,11 @@ packages:
 
   /tr46/0.0.3:
     resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}
+    dev: false
+
+  /treeify/1.1.0:
+    resolution: {integrity: sha512-1m4RA7xVAJrSGrrXGs0L3YTwyvBs2S8PbRHaLZAkFw7JR8oIFwYtysxlBZhYIa7xSyiYJKZ3iGrrk55cGA3i9A==}
+    engines: {node: '>=0.6'}
     dev: false
 
   /tunnel-agent/0.6.0:

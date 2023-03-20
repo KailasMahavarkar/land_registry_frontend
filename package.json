@@ -11,6 +11,9 @@
 		"tail": "postcss tailwindcss -i ./styles/main.scss -o ./styles/main.css"
 	},
 	"dependencies": {
+		"@drizzle/react-components": "^1.5.3",
+		"@drizzle/react-plugin": "^1.5.3",
+		"@drizzle/store": "^1.5.3",
 		"@fortawesome/fontawesome": "^1.1.8",
 		"@fortawesome/fontawesome-svg-core": "^6.2.0",
 		"@fortawesome/free-regular-svg-icons": "^6.2.0",
@@ -33,9 +36,7 @@
 		"sass": "^1.55.0",
 		"sweetalert2": "^11.6.14",
 		"theme-change": "^2.2.0",
-		"@drizzle/react-components": "^1.5.3",
-		"@drizzle/react-plugin": "^1.5.3",
-		"@drizzle/store": "^1.5.3"
+		"treeify": "^1.1.0"
 	},
 	"devDependencies": {
 		"@reduxjs/toolkit": "^1.9.0",
@@ -46,6 +47,7 @@
 		"@types/react-router-dom": "^5.3.3",
 		"@types/redux": "^3.6.0",
 		"@types/redux-logger": "^3.0.9",
+		"@types/treeify": "^1.0.0",
 		"@vitejs/plugin-react": "^2.2.0",
 		"autoprefixer": "^10.4.13",
 		"postcss": "^8.4.18",

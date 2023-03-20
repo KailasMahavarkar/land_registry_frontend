@@ -1,247 +1,363 @@
 import { faArrowsSplitUpAndLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import produce from "immer";
-import { useState } from "react";
-import { useEffectAsync } from "../../helper";
+import { useEffect, useState } from "react";
 import customToast from "../../toast";
+import LandTokenVerify from "../LandTokenVerify";
+import axios from "axios";
+import produce from "immer";
 
-type colorType = "red" | "blue" | "green" | "yellow" | "violet";
 
 const EmployeeSplitLandCase = () => {
-	const [verifed, setVerified] = useState(false);
+    const [landToken, setLandToken] = useState(1);
+    const [verifed, setVerified] = useState(false);
+    const [totalSplits, setTotalSplits] = useState(2);
+    const [data, setData] = useState<{
+        ownerName: string;
+        ownerAadhaarCardNumber: string;
+        ownerPanCardNumber: string;
+        surveyNumber: number;
+        subSurveyNumber: number;
+        propertyLength: number;
+        propertyWidth: number;
+    }[]>([])
 
-	const [activeColor, setActiveColor] = useState<colorType>("red");
 
-	const [totalSplits, setTotalSplits] = useState(2);
+    const formSubmitHandler = async () => {
 
-	const palette = {
-		red: 1,
-		blue: 2,
-		green: 3,
-		yellow: 4,
-		violet: 5,
-	};
+        // loop through the data and validate the data
+        // if any data is invalid then throw an error
+        const invalidData = data.find((d) => {
+            return (
+                !d.ownerName ||
+                !d.ownerAadhaarCardNumber ||
+                !d.ownerPanCardNumber ||
+                !d.surveyNumber ||
+                !d.subSurveyNumber ||
+                !d.propertyLength ||
+                !d.propertyWidth
+            )
+        })
 
-	const [landColorMap, setLandColorMap] = useState<number[][]>([]);
+        if (invalidData) {
+            return customToast({
+                message: "Please fill all the fields",
+                icon: "error",
+            })
+        }
 
-	useEffectAsync(() => {
-		const tempRawMap = [];
-		for (let i = 0; i < 5; i++) {
-			const row = [];
-			for (let j = 0; j < 20; j++) {
-				row.push(0);
-			}
-			tempRawMap.push(row);
-		}
-		setLandColorMap(tempRawMap);
-	}, []);
+        try {
+            const result = await axios.post("/property/split", {
+                propertyId: landToken,
+                ownerName: data.map((d) => d.ownerName),
+                propertyLength: data.map((d) => d.propertyLength),
+                propertyWidth: data.map((d) => d.propertyWidth),
+                ownerAadhaarCardNumber: data.map((d) => d.ownerAadhaarCardNumber),
+                ownerPanCardNumber: data.map((d) => d.ownerPanCardNumber),
+                surveyNumber: data.map((d) => d.surveyNumber),
+                subSurveyNumber: data.map((d) => d.subSurveyNumber),
 
-	const findColor = (col: number) => {
-		if (col === 1) return "bg-red-500";
-		if (col === 2) return "bg-blue-500";
-		if (col === 3) return "bg-green-500";
-		if (col === 4) return "bg-yellow-500";
-		if (col === 5) return "bg-violet-500";
-		return "bg-base-200";
-	};
+                documentDocId: [],
+                documentHash: [],
+                documentLink: [],
+                documentName: [],
+            })
 
-	return (
-		<>
-			<div>
-				<h2>Split Land Case</h2>
-				<div className="flex flex-col flex-end">
-					<div className="form-control max-w-md">
-						<label htmlFor="land-split">
-							<span>Land Token</span>
-						</label>
-						<input
-							type="text"
-							className="input input-bordered"
-							placeholder="Case ID"
-						/>
-						<div className="flex justify-end ">
-							<button
-								className="btn btn-primary btn-sm m-2"
-								onClick={() => setVerified(true)}
-							>
-								Click to Verify
-							</button>
-						</div>
-					</div>
-				</div>
-			</div>
+            if (result) {
+                setData(
+                    Array.from({ length: totalSplits }).map((data: any, index: number) => {
+                        return {
+                            ownerName: "",
+                            ownerAadhaarCardNumber: "",
+                            ownerPanCardNumber: "",
+                            surveyNumber: 0,
+                            subSurveyNumber: 0,
+                            propertyLength: 0,
+                            propertyWidth: 0,
+                        }
+                    })
+                )
+            }
 
-			<div>
-				<div className="flex flex-col flex-end">
-					<div className="form-control max-w-md">
-						<label htmlFor="land-split">
-							<span>Total land splits ?</span>
-						</label>
-						<input
-							type="number"
-							className="input input-bordered"
-							placeholder="3"
-							value={totalSplits}
-							onChange={(e) =>
-								setTotalSplits(parseInt(e.target.value))
-							}
-						/>
-					</div>
-				</div>
-			</div>
+            return customToast({
+                message: "Land Split Case Created",
+                icon: "success",
+            })
 
-			{/* <table>
-				<tbody>
-					{landColorMap.map((row, i) => (
-						<tr key={i}>
-							{row.map((col, j) => (
-								<td
-									key={j}
-									className={`w-4 h-4 border border-black ${findColor(
-										col
-									)}`}
-								/>
-							))}
-						</tr>
-					))}
-				</tbody>
-			</table> */}
+        } catch (error: any) {
+            console.log("error", error)
 
-			<div className="divider"></div>
-			{verifed && (
-				<>
-					<div className="flex flex-col flex-end mt-5">
-						<div className="flex child:m-2">
-							<div>Select Color</div>
-							{Object.keys(palette).map((color: any) => (
-								<div
-									className={`
-                                w-10 h-10 bg-${color}-500
-                                ${
-									activeColor === color
-										? "border-[5px] border-red-500"
-										: ""
-								}}
-                                `}
-									onClick={() => setActiveColor(color)}
-								></div>
-							))}
-						</div>
-						<div className="overflow-x-auto">
-							{/* create 2x2 grid */}
-							{/* color the grid when you move mouse */}
-							{/* disable mouse function when tab is pressed */}
-							<div className="flex items-center p-5 flex-col w-full border-2 ">
-								{landColorMap.map((row, i) => (
-									<div className="flex">
-										{row.map((col, j) => (
-											<div
-												className={`w-10 h-10 border-[1px] border-black ${findColor(
-													col
-												)}`}
-												onClick={() => {
-													if (activeColor) {
-														setLandColorMap(
-															produce(
-																landColorMap,
-																(draft) => {
-																	draft[i][
-																		j
-																	] =
-																		palette[
-																			activeColor
-																		];
-																}
-															)
-														);
-													}
-												}}
-											></div>
-										))}
-									</div>
-								))}
-							</div>
-						</div>
-					</div>
+            customToast({
+                message: error.response.data.message,
+                icon: "error",
+            })
+        }
+    }
 
-					{/* map each color to input for property owner */}
+    useEffect(() => {
+        setData(
+            Array.from({ length: totalSplits }).map((data: any, index: number) => {
+                return {
+                    ownerName: "",
+                    ownerAadhaarCardNumber: "",
+                    ownerPanCardNumber: "",
+                    surveyNumber: 0,
+                    subSurveyNumber: 0,
+                    propertyLength: 0,
+                    propertyWidth: 0,
+                }
+            })
+        )
+    }, [totalSplits])
 
-					<div className="flex flex-col flex-end mt-5">
-						<div className="overflow-x-auto">
-							<table className="table w-full">
-								<thead>
-									<tr>
-										<th></th>
-										<th>Color</th>
-										<th>Area Width</th>
-										<th>Area Height</th>
-										<th>Entity Name</th>
-										<th>Entity Aadhar</th>
-									</tr>
-								</thead>
-								<tbody>
-									{Object.keys(palette).map(
-										(color: any, index: number) => (
-											<tr key={index}>
-												<th>{index}</th>
-												<td>
-													<div
-														className={`w-10 h-10 bg-${color}-500`}
-													></div>
-												</td>
-												<td>
-													<input
-														type="number"
-														className="input input-bordered w-full"
-													/>
-												</td>
-												<td>
-													<input
-														type="number"
-														className="input input-bordered w-full"
-													/>
-												</td>
-												<td>
-													<input
-														type="text"
-														className="input input-bordered w-full"
-													/>
-												</td>
-												<td>
-													<input
-														type="text"
-														className="input input-bordered w-full"
-													/>
-												</td>
-											</tr>
-										)
-									)}
-								</tbody>
-							</table>
-						</div>
-					</div>
+    return (
+        <>
+            <div>
+                <h2>Split Land Case</h2>
+                <div className="flex flex-col flex-end">
+                    <div className="form-control max-w-md">
+                        <LandTokenVerify
+                            verified={verifed}
+                            setVerified={setVerified}
+                            landToken={landToken}
+                            setLandToken={setLandToken}
+                        />
+                    </div>
+                </div>
+            </div>
 
-					<div>
-						<button className="btn btn-primary m-2"
-                            onClick={() => {
-                                customToast({
-                                    message: "Many fields are empty",
-                                    icon: "error",
-                                })
-                            }}
+            <div>
+                <pre>
+                    {JSON.stringify(data, null, 2)}
+                </pre>
+            </div>
+
+            {verifed &&
+                <div>
+                    <div className="flex flex-col flex-end">
+                        <div className="form-control max-w-md">
+                            <label htmlFor="land-split">
+                                <span>Total land splits ?</span>
+                            </label>
+                            <input
+                                type="number"
+                                className="input input-bordered"
+                                placeholder="3"
+                                value={totalSplits}
+                                onChange={(e) =>
+                                    setTotalSplits(parseInt(e.target.value))
+                                }
+                            />
+                        </div>
+                    </div>
+                </div>
+            }
+
+
+            <div className="divider"></div>
+            {verifed && (
+                <>
+                    <div className="flex flex-col flex-end mt-5">
+                        <div className="overflow-x-auto">
+                            {
+                                Array.from({ length: totalSplits }).map(
+                                    (color: any, index: number) => {
+                                        return (
+                                            <>
+                                                <h1>
+                                                    Split {index + 1} of {totalSplits}
+                                                </h1>
+
+                                                {/* Owner Name & Aadhar Card Number  */}
+                                                <div className="flex justify-around w-full">
+                                                    <div className="form-control w-full max-w-xs">
+                                                        <label className="label">
+                                                            <span className="label-text">
+                                                                Owner Name
+                                                                <span className="text-red-500">
+                                                                    {" *"}
+                                                                </span>
+                                                            </span>
+                                                        </label>
+                                                        <input
+                                                            type="text"
+                                                            placeholder="Type here"
+                                                            className="input input-bordered w-full max-w-xs"
+                                                            value={data[index].ownerName}
+                                                            onChange={(e: any) => {
+                                                                setData(
+                                                                    produce(data, (draft) => {
+                                                                        draft[index].ownerName = e.target.value;
+                                                                    })
+                                                                )
+                                                            }}
+                                                        />
+                                                    </div>
+
+                                                    <div className="form-control w-full max-w-xs">
+                                                        <label className="label">
+                                                            <span className="label-text">
+                                                                Aadhar Card Number
+                                                                <span className="text-red-500">
+                                                                    {" *"}
+                                                                </span>
+                                                            </span>
+                                                        </label>
+                                                        <input
+                                                            type="text"
+                                                            placeholder="Type here"
+                                                            className="input input-bordered w-full max-w-xs"
+                                                            value={data[index].ownerAadhaarCardNumber}
+                                                            onChange={(e: any) => {
+                                                                setData(
+                                                                    produce(data, (draft) => {
+                                                                        draft[index].ownerAadhaarCardNumber = e.target.value;
+                                                                    })
+                                                                )
+                                                            }}
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                {/* House & Length  */}
+                                                <div className="flex justify-around w-full">
+                                                    <div className="form-control w-full max-w-xs">
+                                                        <label className="label">
+                                                            <span className="label-text">
+                                                                Pan Number
+                                                            </span>
+                                                        </label>
+                                                        <input
+                                                            type="text"
+                                                            className="input input-bordered w-full max-w-xs"
+                                                            value={data[index].ownerPanCardNumber}
+                                                            onChange={(e: any) => {
+                                                                setData(
+                                                                    produce(data, (draft) => {
+                                                                        draft[index].ownerPanCardNumber = e.target.value;
+                                                                    })
+                                                                )
+                                                            }}
+                                                        />
+                                                    </div>
+                                                    <div className="form-control w-full max-w-xs">
+                                                        <label className="label">
+                                                            <span className="label-text">
+                                                                Property Length
+                                                            </span>
+                                                        </label>
+                                                        <input
+                                                            type="number"
+                                                            className="input input-bordered w-full max-w-xs"
+                                                            value={data[index].propertyLength}
+                                                            onChange={(e: any) => {
+                                                                setData(
+                                                                    produce(data, (draft) => {
+                                                                        draft[index].propertyLength = Number(e.target.value);
+                                                                    })
+                                                                )
+                                                            }}
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                {/* Width & Survey */}
+                                                <div className="flex justify-around w-full">
+                                                    <div className="form-control w-full max-w-xs">
+                                                        <label className="label">
+                                                            <span className="label-text">
+                                                                Property Width
+                                                            </span>
+                                                        </label>
+                                                        <input
+                                                            type="number"
+                                                            className="input input-bordered w-full max-w-xs"
+                                                            value={data[index].propertyWidth}
+                                                            onChange={(e: any) => {
+                                                                setData(
+                                                                    produce(data, (draft) => {
+                                                                        draft[index].propertyWidth = Number(e.target.value);
+                                                                    })
+                                                                )
+                                                            }}
+                                                        />
+                                                    </div>
+                                                    <div className="form-control w-full max-w-xs">
+                                                        <label className="label">
+                                                            <span className="label-text">
+                                                                Survey Number
+                                                            </span>
+                                                        </label>
+                                                        <input
+                                                            type="number"
+                                                            className="input input-bordered w-full max-w-xs"
+                                                            value={data[index].surveyNumber}
+                                                            onChange={(e: any) => {
+                                                                setData(
+                                                                    produce(data, (draft) => {
+                                                                        draft[index].surveyNumber = Number(e.target.value);
+                                                                    })
+                                                                )
+                                                            }}
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                {/* Sub Survey */}
+                                                <div className="flex justify-around w-full">
+                                                    <div className="form-control w-full max-w-xs">
+                                                        <label className="label">
+                                                            <span className="label-text">
+                                                                Sub Survey Number
+                                                            </span>
+                                                        </label>
+                                                        <input
+                                                            type="number"
+                                                            className="input input-bordered w-full max-w-xs"
+                                                            value={data[index].subSurveyNumber}
+                                                            onChange={(e: any) => {
+                                                                setData(
+                                                                    produce(data, (draft) => {
+                                                                        draft[index].subSurveyNumber = Number(e.target.value);
+                                                                    })
+                                                                )
+                                                            }}
+                                                        />
+                                                    </div>
+                                                    <div className="form-control w-full max-w-xs">
+                                                        <label className="label">
+
+                                                        </label>
+
+                                                    </div>
+                                                </div>
+
+
+                                                <div className="divider"></div>
+                                            </>
+                                        )
+                                    }
+                                )
+                            }
+                        </div>
+                    </div >
+
+                    <div>
+                        <button className="btn btn-primary m-2"
+                            onClick={formSubmitHandler}
                         >
-							Split Lands
-							<FontAwesomeIcon
-								size="1x"
-								className="mx-2"
-								icon={faArrowsSplitUpAndLeft}
-							/>
-						</button>
-					</div>
-				</>
-			)}
-		</>
-	);
+                            Split Lands
+                            <FontAwesomeIcon
+                                size="1x"
+                                className="mx-2"
+                                icon={faArrowsSplitUpAndLeft}
+                            />
+                        </button>
+                    </div>
+                </>
+            )
+            }
+        </>
+    );
 };
 
 export default EmployeeSplitLandCase;

@@ -50,7 +50,6 @@ const RootAccessControl = () => {
 							<th>Read</th>
 							<th>Split</th>
 							<th>Merge</th>
-							<th>Lease</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -110,21 +109,6 @@ const RootAccessControl = () => {
 										/>
 									</td>
 
-									{/* lease permission */}
-									<td>
-										<input
-											type="checkbox"
-											name="lease"
-											checked={user.permissions.lease}
-											className="checkbox checkbox-primary"
-											onChange={(e) => {
-												permissionChangeHandler(
-													e,
-													user._id
-												);
-											}}
-										/>
-									</td>
 								</tr>
 							);
 						})}
