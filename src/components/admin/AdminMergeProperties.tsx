@@ -4,17 +4,18 @@ import { useContext, useState } from "react";
 import customToast from "../../toast";
 import treeify from "treeify";
 import CustomContext from "../../context/custom.context";
+import useDrizzle from "../../hooks/useDrizzle";
+import { propertyType } from "../../types/type";
+import { propertyDefault } from "../../default_state/propertyDefault";
 
-interface PropertyCardProps {
-    propertyId: number;
-    childIds: number[];
-}
+
 
 const AdminMergeProperties = () => {
     const { drizzle } = useContext(CustomContext);
+    const { getProperty } = useDrizzle();
 
-    const drizzleMethods = drizzle.contracts.LandRegistry.methods;
-    const [properties, setProperties] = useState<PropertyCardProps[]>([]);
+    const [properties, setProperties] = useState<propertyType[]>([]);
+    const [previousProperties, setPreviousProperties] = useState<any>([]);
 
     const [expanded, setExpanded] = useState({
         index: -1,
@@ -33,7 +34,7 @@ const AdminMergeProperties = () => {
         propertyId: number,
     ) => {
         const targetProperty = properties.find((property) => {
-            return property.propertyId === propertyId;
+            return (property as any)._id === propertyId;
         });
 
         if (!targetProperty) {
@@ -43,43 +44,56 @@ const AdminMergeProperties = () => {
             });
         }
 
-        // get the parent property
-        const parentProperty = await drizzleMethods
-            .getProperty(targetProperty?.propertyId)
-            .call();
+        let allPromises: Promise<any>[] = [];
 
+        for (let index = 0; index < targetProperty?.transferedFrom.length; index++) {
+            allPromises.push(
+                getProperty(targetProperty?.transferedFrom[index])
+            )
+        }
 
-        const schema = {
-            propertyHouseNumber: parentProperty.propertyHouseNumber,
-            propertyStreetName: parentProperty.propertyStreetName,
-            propertyType: parentProperty.propertyType,
-            propertyLength: parentProperty.propertyLength,
-            propertyWidth: parentProperty.propertyWidth,
-            propertyPincode: parentProperty.propertyPincode,
-            propertyState: parentProperty.propertyState,
-            propertyVillage: parentProperty.propertyVillage,
-            propertyDistrict: parentProperty.propertyDistrict,
-            propertyTaluka: parentProperty.propertyTaluka,
+        const promisesResolved = await Promise.all(allPromises)
+        setPreviousProperties(promisesResolved);
 
-            ownerName: parentProperty.ownerName,
-            aadharCardNumber: parentProperty.aadharCardNumber,
-            panCardNumber: parentProperty.panCardNumber,
+        const property = {
+            propertyHouseName: targetProperty.propertyHouseNumber,
+            propertyStreetName: targetProperty.propertyStreetName,
+            propertyType: targetProperty.propertyType,
+            propertyLength: targetProperty.propertyLength,
+            propertyWidth: targetProperty.propertyWidth,
+            propertyPincode: targetProperty.propertyPincode,
+            propertyState: targetProperty.propertyState,
+            propertyVillage: targetProperty.propertyVillage,
+            propertyDistrict: targetProperty.propertyDistrict,
+            propertyTaluka: targetProperty.propertyTaluka,
 
-            transfered: true,
-            transferedTo: targetProperty?.propertyId,
-            transferedFrom: targetProperty?.childIds,
-            propertySplitLandId: [],
+            ownerName: targetProperty.ownerName,
+            aadharCardNumber: targetProperty.aadharCardNumber,
+            panCardNumber: targetProperty.panCardNumber,
 
-            surveyNumber: parentProperty.surveyNumber,
-            subSurveyNumber: parentProperty.subSurveyNumber,
-            createdOn: parentProperty.createdOn,
+            transfered: targetProperty.transfered,
+            transferedTo: targetProperty.transferedTo,
+            transferedFrom: targetProperty.transferedFrom,
+            propertySplitLandId: targetProperty.propertySplitLandId,
 
-            documents: [],
-        };
+            surveyNumber: targetProperty.surveyNumber,
+            subSurveyNumber: targetProperty.subSurveyNumber,
+            createdOn: targetProperty.createdOn,
+
+            documents: (targetProperty as any).documents.map((document: any) => {
+                return {
+                    docId: document.docId,
+                    hash: document.hash,
+                    name: document.name,
+                    link: document.link,
+                    verified: document.verified,
+                };
+            })
+        }
 
         try {
             const result = await drizzle.contracts.LandRegistry.methods
-                .mergeProperties(Object.values(schema))
+                .mergeProperties(Object.values(property))
                 .send();
 
             if (!result) {
@@ -90,16 +104,14 @@ const AdminMergeProperties = () => {
             }
 
             axios.patch("/property/merge", {
-                propertyId: propertyId,
+                _id: (targetProperty as any)._id,
                 status: "approved",
             }).then((response) => {
                 const newProperties = properties.filter((property, index) => {
-                    return property.propertyId !== propertyId;
+                    return (property as any)._id !== propertyId;
                 });
                 setProperties(newProperties);
             })
-
-
 
 
         } catch (error: any) {
@@ -110,18 +122,18 @@ const AdminMergeProperties = () => {
             });
         }
 
-        try {
+        // try {
 
-            customToast({
-                message: "Merge Successful",
-                icon: "success",
-            });
-        } catch (error: any) {
-            customToast({
-                message: "Something went wrong while merging properties",
-                icon: "error",
-            })
-        }
+        //     customToast({
+        //         message: "Merge Successful",
+        //         icon: "success",
+        //     });
+        // } catch (error: any) {
+        //     customToast({
+        //         message: "Something went wrong while merging properties",
+        //         icon: "error",
+        //     })
+        // }
     };
 
     const getProperties = async () => {
@@ -172,9 +184,9 @@ const AdminMergeProperties = () => {
                                     <>
                                         <tr key={index}>
                                             <th colSpan={5}>{index + 1}</th>
-                                            <td>{property.propertyId}</td>
+                                            <td>{(property as any)._id}</td>
                                             <td>
-                                                {property?.childIds.map(
+                                                {property?.transferedFrom.map(
                                                     (id: number) => {
                                                         return <>{`${id} `}</>;
                                                     }
@@ -197,7 +209,7 @@ const AdminMergeProperties = () => {
                                                 <button
                                                     className="btn btn-sm btn-success"
                                                     onClick={() =>
-                                                        mergeHandler(property.propertyId)
+                                                        mergeHandler((property as any)._id)
                                                     }
                                                 >
                                                     Approve

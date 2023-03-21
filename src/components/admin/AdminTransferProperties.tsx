@@ -1,9 +1,9 @@
 import axios from "axios";
-import { useEffectAsync } from "../../helper";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import customToast from "../../toast";
 import treeify from "treeify";
 import CustomContext from "../../context/custom.context";
+import useDrizzle from "../../hooks/useDrizzle";
 
 interface PropertyCardProps {
     propertyId: number;
@@ -24,12 +24,21 @@ interface PropertyCardProps {
 
 const AdminTransferProperties = () => {
     const { drizzle } = useContext(CustomContext);
+    const { getProperty } = useDrizzle();
+
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [previousData, setPreviousData] = useState<any>({});
     const [properties, setProperties] = useState<PropertyCardProps[]>([]);
 
     const [expanded, setExpanded] = useState({
         index: -1,
         expanded: false,
     });
+
+    // useEffectAsync(async ()=>{
+    //     const previousOwnerData = await getPropert(???);    
+    // }, [])
+
 
     const toggleExpansion = (index: number, expanded: boolean) => {
         // set current expanded to true
@@ -54,13 +63,10 @@ const AdminTransferProperties = () => {
             });
         }
 
-        const propertyFromBlock = await drizzle.contracts.LandRegistry.methods
-            .getRegisteredLandCount()
-            .call();
-
 
         try {
-            await drizzle.contracts.LandRegistry.methods
+
+            const block = await drizzle.contracts.LandRegistry.methods
                 .transferOwnership(
                     [targetProperty.propertyId],
                     targetProperty.newOwnerName,
@@ -70,22 +76,38 @@ const AdminTransferProperties = () => {
                 )
                 .send();
 
+
+            const landId = block['events']['sendPropertyId']['returnValues']['_id'];
+
+            customToast({
+                message: `Transaction successful, New Token Id is ${landId}`,
+                icon: "success",
+                timer: 10000
+            })
+
+            // console.log({
+            //     _id: (targetProperty as any)._id,
+            //     propertyId: landId,
+            // })
+
+            axios
+                .patch("/property/transfer", {
+                    propertyId: propertyId,
+                    status: status,
+                })
+                .then(() => {
+                    const newProperties = properties.filter((property, index) => {
+                        return propertyId !== property.propertyId;
+                    });
+                    setProperties(newProperties);
+                });
+
             console.log("success ")
         } catch (error) {
-            console.log("transaction failed")
+            console.log("transaction failed --> ", error)
         }
 
-        axios
-            .patch("/property/transfer", {
-                propertyId: propertyId,
-                status: status,
-            })
-            .then(() => {
-                const newProperties = properties.filter((property, index) => {
-                    return propertyId !== property.propertyId;
-                });
-                setProperties(newProperties);
-            });
+
     };
 
     const getProperties = async () => {
@@ -102,9 +124,7 @@ const AdminTransferProperties = () => {
         }
     };
 
-    useEffectAsync(async () => {
-        await getProperties();
-    }, []);
+
 
     return (
         <div>
@@ -118,7 +138,7 @@ const AdminTransferProperties = () => {
                             <thead>
                                 <tr>
                                     <th colSpan={5}></th>
-                                    <th>Property ID</th>
+                                    <th>Transaction ID</th>
                                     <th>Owner Name</th>
                                     <th>State</th>
                                     <th>Created On</th>
@@ -132,7 +152,7 @@ const AdminTransferProperties = () => {
                                     <>
                                         <tr key={index}>
                                             <th colSpan={5}>{index + 1}</th>
-                                            <td>{property.propertyId}</td>
+                                            <td>{(property as any)._id}</td>
                                             <td>{property.newOwnerName}</td>
                                             <td>
                                                 {
@@ -142,7 +162,14 @@ const AdminTransferProperties = () => {
                                             <td>
                                                 <button
                                                     className="btn btn-sm"
-                                                    onClick={() => {
+                                                    onClick={async () => {
+
+                                                        setPreviousData(
+                                                            await getProperty(
+                                                                property.propertyId
+                                                            )
+                                                        )
+
                                                         toggleExpansion(
                                                             index,
                                                             !expanded.expanded
@@ -182,9 +209,10 @@ const AdminTransferProperties = () => {
                                             expanded.index === index && (
                                                 <pre>
                                                     {treeify.asTree(
-                                                        properties[
-                                                        expanded.index
-                                                        ] as any,
+                                                        {
+                                                            ...previousData,
+                                                            ...properties[expanded.index] as any,
+                                                        },
                                                         true,
                                                         true
                                                     )}

@@ -12,43 +12,30 @@ const EmployeePropertyDetails = () => {
 
     useEffectAsync(async () => {
         const data = (await getProperty(token));
-        setProperty({
-            aadharCardNumber: data[0],
-            createdOn: data[1],
-            length: data[2],
-            ownerName: data[3],
-            panCardNumber: data[4],
-            propertyDistrict: data[5],
-            propertyHouseNumber: data[6],
 
-            propertyLength: data[7],
-            propertyPincode: data[8],
-            propertySplitLandId: data[9],
-            propertyState: data[10],
-            propertyStreetName: data[11],
-            propertyTaluka: data[12],
-            propertyType: data[13],
+        const halfLen = Object.keys(data).length / 2;
 
-            propertyVillage: data[14],
-            propertyWidth: data[15],
-            subSurveyNumber: data[16],
-            surveyNumber: data[17],
-            transfered: data[18],
-            transferedFrom: data[19],
-            transferedTo: data[20],
+        const keyData = Object.keys(data).splice(halfLen, halfLen * 2).map((property, index) => {
+            return {
+                [property]: data[property]
+            }
         })
+        setProperty(keyData)
 
     }, [token])
 
     return (
         <>
-            <div>
+            <div className="mb-5">
                 <h1>Get Property Details by token id</h1>
-                <LandTokenVerify
-                    landToken={token}
-                    setLandToken={setToken}
-                    verified={verified}
-                    setVerified={setVerified}
+                <input
+                    type="number"
+                    className="input input-bordered"
+                    placeholder="Case ID"
+                    value={token}
+                    onChange={(e) => {
+                        setToken(Number(e.target.value));
+                    }}
                 />
             </div>
             <div>

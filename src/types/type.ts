@@ -146,41 +146,13 @@ export type profileType = {
     refreshToken: string;
 };
 
-
-// uint256 propertyId;
-// string propertyHouseNumber;
-// string propertyStreetName;
-// string propertyType;
-// uint256 propertyArea;
-// uint256 propertyPincode;
-// string propertyState;
-// string propertyVillage;
-// string propertyDistrict;
-// string propertyTaluka;
-// // owner details
-// string ownerName;
-// string aadharCardNumber;
-// string panCardNumber;
-// string addressProofA;
-// string addressProofB;
-// // transfer details (if any)
-// bool transfered;
-// uint256 transferedTo;
-// uint256[] transferedFrom;
-// uint256[] propertySplitLandId;
-// // ownership details
-// uint256 surveyNumber;
-// uint256 subSurveyNumber;
-// string createdOn;
-// // documents
-// string[] documentNames;
-// mapping(string => document) documents;
 export type propertyType = {
     propertyHouseNumber: string;
     propertyStreetName: string;
     propertyType: string;
-    propertyArea: string;
-    propertyPincode: string;
+    propertyLength: number;
+    propertyWidth: number;
+    propertyPincode: number;
     propertyState: string;
     propertyVillage: string;
     propertyDistrict: string;
@@ -189,26 +161,15 @@ export type propertyType = {
     ownerName: string;
     aadharCardNumber: string;
     panCardNumber: string;
-    addressProofA: string;
-    addressProofB: string;
     // transfer details (if any)
     transfered: boolean;
-    transferedTo: string;
-    transferedFrom: string[];
-    propertySplitLandId: string[];
+    transferedTo: number;
+    transferedFrom: number[];
+    propertySplitLandId: number[];
     // ownership details
-    surveyNumber: string;
-    subSurveyNumber: string;
+    surveyNumber: number;
+    subSurveyNumber: number;
     createdOn: string;
-    // documents
-    documentNames: string[];
-    documents: {
-        [key: string]: {
-            documentHash: string;
-            documentLink: string;
-        };
-    };
-
 }
 
 export interface singleDocument {

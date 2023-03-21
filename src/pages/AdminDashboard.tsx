@@ -1,5 +1,4 @@
 import { useState } from "react";
-import AdminAnalytics from "../components/admin/AdminAnalytics";
 import AdminUserManagement from "../components/admin/AdminUserManagement";
 import AdminMergeProperties from "../components/admin/AdminMergeProperties";
 import AdminRegisterProperties from "../components/admin/AdminRegisterProperties";
@@ -8,6 +7,7 @@ import AdminTransferProperties from "../components/admin/AdminTransferProperties
 
 const RootDashboard = () => {
     const [active, setActive] = useState("AccessControl");
+
 
     const sidebarNav = [
         {
@@ -42,8 +42,8 @@ const RootDashboard = () => {
                             <button
                                 key={index}
                                 onClick={() => setActive(item.name)}
-                                className={`btn bg-base-200 text-base-content hover:text-white  ${active === item.name ? "btn-active" : ""
-                                    }`}
+
+                                className={`btn bg-base-200 text-base-content hover:text-white  ${active === item.name ? "btn-active" : ""}`}
                             >
                                 {item.name}
                             </button>

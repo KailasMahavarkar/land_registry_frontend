@@ -1,14 +1,22 @@
 import { faArrowsSplitUpAndLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import customToast from "../../toast";
 import useDrizzle from "../../hooks/useDrizzle";
 import produce from "immer";
 import axios from "axios";
-
-type colorType = "red" | "blue" | "green" | "yellow" | "violet";
+import CustomContext from "../../context/custom.context";
+import { propertyType, singleDocument } from "../../types/type";
+import { propertyDefault } from "../../default_state/propertyDefault";
+import PropertyForm from "../../forms/PropertyForm";
+import PropertyUserForm from "../../forms/PropertyUserForm";
+import ImageTable from "../ImageTable";
 
 const EmployeeMergeLandCase = () => {
+    const [property, setProperty] = useState<propertyType>(propertyDefault);
+    const [documents, setDocuments] = useState<singleDocument[]>([]);
+
+
     // landTokens is an array of objects with landToken and verified
     const [landTokens, setLandTokens] = useState<{
         landToken: number;
@@ -31,38 +39,70 @@ const EmployeeMergeLandCase = () => {
     const [landMergeCount, setLandMergeCount] = useState(2);
     const { validateLandToken } = useDrizzle();
 
-    const formSubmitHandler = async () => {
-        // check if all the land tokens are verified
-        if (allTokensVerified) {
+    const formSubmitHandler = async (e: any) => {
+        e.preventDefault();
 
-            
+        let allPromises: Promise<any>[] = [];
 
-            try {
-                const result = await axios.post("/property/merge", {
-                    propertyId: parentLand.landToken,
-                    childIds: landTokens.map((landToken) => landToken.landToken),
-                })
+        for (let index = 0; index < landTokens.length; index++) {
+            const land = landTokens[index];
+            allPromises.push(validateLandToken(land.landToken));
+        }
 
-                if (result) {
-                    customToast({
-                        message: "Land merge request applied",
-                        icon: "success",
-                    });
-                }
-            } catch (error: any) {
-                customToast({
-                    message: error.response?.data?.msg,
-                    icon: "error",
-                });
-            }
-        } else {
-            // show error
+        const promisesResolved = await Promise.all(allPromises);
+
+        // check if all the promises are resolved
+        if (!promisesResolved.every((promise) => promise === true)) {
+            // get 1st invalid token
+            const invalidToken = promisesResolved.findIndex((promise) => promise === false);
             customToast({
-                message: "Please verify all the land tokens",
+                message: `Token ${invalidToken + 1} is invalid`,
+                icon: "error",
+            })
+            return;
+
+        } else {
+            setAllTokensVerified(true);
+
+            customToast({
+                message: "All tokens are valid",
+                icon: "success",
+            })
+        }
+
+        const dataToSend = {
+            ...property,
+            transferedFrom: landTokens.map((x) => x.landToken),
+            documents: documents.map((doc) => {
+                return {
+                    name: doc.name,
+                    docId: doc.docId,
+                    link: doc.link,
+                    hash: doc.hash,
+                    verified: doc.verified,
+                };
+            })
+        }
+
+        console.log(dataToSend);
+
+
+        try {
+            await axios.post("/property/merge", dataToSend);
+
+            customToast({
+                message: "Property Registration Applied",
+                icon: "success",
+            });
+            setProperty(propertyDefault);
+            setDocuments([]);
+        } catch (err) {
+            customToast({
+                message: "Property Registration Error",
                 icon: "error",
             });
         }
-    }
+    };
 
     useEffect(() => {
         // set the landTokens array to the length of landMergeCount
@@ -102,24 +142,27 @@ const EmployeeMergeLandCase = () => {
             <pre>
                 {JSON.stringify(landTokens, null, 2)}
             </pre>
-            <div>
-                <div className="form-control max-w-md ">
-                    <label htmlFor="land-split">
-                        <span>Parent Land Id</span>
-                    </label>
-                    <input
-                        type="number"
-                        className="input input-bordered input-secondary "
-                        value={parentLand.landToken}
-                        onChange={(e) => {
-                            setParentLand({
-                                landToken: Number(e.target.value),
-                                verified: false,
-                            })
-                        }}
-                    />
-                </div>
-            </div>
+
+            {
+                landTokens.length > 0 && (
+                    <>
+
+                        <PropertyUserForm
+                            property={property}
+                            setProperty={setProperty}
+                        />
+                        <PropertyForm
+                            property={property}
+                            setProperty={setProperty}
+                        />
+                        <ImageTable
+                            documents={documents}
+                            setDocuments={setDocuments}
+                        />
+                    </>
+                )
+            }
+
             <div className="flex flex-col flex-end mt-5">
                 {
                     // loop through the array using array fill
@@ -159,90 +202,15 @@ const EmployeeMergeLandCase = () => {
 
 
                 <div className="mt-5">
-                    {
-                        !allTokensVerified && (
-                            <button
-                                className="btn btn-primary"
-                                onClick={async () => {
-
-                                    // validate the parent land token
-                                    const parentLandTokenValid = await validateLandToken(parentLand.landToken);
-
-                                    if (!parentLandTokenValid) {
-                                        customToast({
-                                            message: "Parent land token is invalid",
-                                            icon: "error",
-                                        })
-                                        return;
-                                    }
-
-                                    // any child land token is invalid if it matches the parent land token
-                                    const childLandTokenInvalid = landTokens.some((landToken) => landToken.landToken === parentLand.landToken);
-
-                                    if (childLandTokenInvalid) {
-                                        customToast({
-                                            message: "Child land token cannot be parent",
-                                            icon: "error",
-                                        })
-                                        return;
-                                    }
-
-
-                                    let allPromises: Promise<any>[] = [];
-
-                                    for (let index = 0; index < landTokens.length; index++) {
-                                        const land = landTokens[index];
-                                        allPromises.push(validateLandToken(land.landToken));
-                                    }
-
-                                    const promisesResolved = await Promise.all(allPromises);
-
-                                    // check if all the promises are resolved
-                                    if (promisesResolved.every((promise) => promise === true)) {
-
-                                        setAllTokensVerified(true);
-
-                                        customToast({
-                                            message: "All tokens are valid",
-                                            icon: "success",
-                                        })
-                                    } else {
-                                        // get 1st invalid token
-                                        const invalidToken = promisesResolved.findIndex((promise) => promise === false);
-                                        customToast({
-                                            message: `Token ${invalidToken + 1} is invalid`,
-                                            icon: "error",
-                                        })
-                                    }
-
-
-                                }}
-                            >
-                                Verify All tokens
-                            </button>
-                        )
-                    }
+                    <button
+                        className="btn btn-primary"
+                        onClick={formSubmitHandler}
+                    >
+                        Submit Merge Request
+                    </button>
 
                 </div>
 
-                {allTokensVerified && (
-                    <>
-                        <div className="divider"></div>
-                        <div>
-                            <button
-                                className="btn btn-success m-2"
-                                onClick={formSubmitHandler}
-                            >
-                                Merge Lands
-                                <FontAwesomeIcon
-                                    size="1x"
-                                    className="mx-2"
-                                    icon={faArrowsSplitUpAndLeft}
-                                />
-                            </button>
-                        </div>
-                    </>
-                )}
             </div>
         </>
     );

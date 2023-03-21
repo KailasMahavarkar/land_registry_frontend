@@ -110,25 +110,28 @@ const AdminRegisterProperties = () => {
         console.log("property", property)
 
         try {
-            const metamaskResult = await drizzle.contracts.LandRegistry.methods
+            const block = await drizzle.contracts.LandRegistry.methods
                 .registerNewProperty(Object.values(property)).send();
 
-            if (!metamaskResult) {
-                return customToast({
-                    message: "Transaction failed",
-                    icon: "error",
-                });
-            }
+            const landId = block['events']['sendPropertyId']['returnValues']['_id'];
+
+            console.log({
+                _id: (targetProperty as any)._id,
+                propertyId: landId,
+            })
 
             axios.patch("/property/register", {
-                propertyId: propertyId,
+                _id: (targetProperty as any)._id,
+                propertyId: landId,
                 status: status,
-            }).then((response) => {
+            }).then(() => {
                 const newProperties = properties.filter((property, index) => {
                     return property.propertyId !== targetProperty.propertyId;
                 });
                 setProperties(newProperties);
+
             })
+
 
         } catch (error: any) {
             console.log("error", error)
@@ -147,7 +150,7 @@ const AdminRegisterProperties = () => {
             setProperties(response.data?.data);
         } catch (error: any) {
             return customToast({
-                message: error.response.data.message,
+                message: error.response.data.msg,
                 icon: "error",
             });
         }
@@ -163,7 +166,7 @@ const AdminRegisterProperties = () => {
                         {/* head */}
                         <thead>
                             <tr>
-                                <th >Property ID</th>
+                                <th>Transaction ID</th>
                                 <th>Owner Name</th>
                                 <th>State</th>
                                 <th>Created On</th>
@@ -176,7 +179,7 @@ const AdminRegisterProperties = () => {
                             {properties.map((property, index) => (
                                 <>
                                     <tr key={index}>
-                                        <td >{property.propertyId}</td>
+                                        <td >{(property as any)._id}</td>
                                         <td>{property.ownerName}</td>
                                         <td>{property.propertyState}</td>
                                         <td>{property.createdOn}</td>
