@@ -28,7 +28,7 @@ const RootDashboard = () => {
         },
 
         {
-            name: "ManageUsers",
+            name: "Manage Users",
             component: <AdminUserManagement />,
         },
     ];

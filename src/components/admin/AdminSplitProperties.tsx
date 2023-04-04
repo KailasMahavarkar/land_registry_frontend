@@ -92,18 +92,17 @@ const AdminSplitProperties = () => {
                 .splitProperty(Object.values(struct))
                 .send();
 
-            if (result) {
-                await axios.patch("/property/split", {
-                    propertyId: propertyId,
-                    status: status,
-                })
 
-                const newProperties = properties.filter((property, index) => {
-                    return propertyId !== property.propertyId;
-                });
+            await axios.patch("/property/split", {
+                propertyId: propertyId,
+                status: status,
+            })
 
-                setProperties(newProperties);
-            }
+            const newProperties = properties.filter((property, index) => {
+                return propertyId !== property.propertyId;
+            });
+
+            setProperties(newProperties);
 
 
         } catch (error) {

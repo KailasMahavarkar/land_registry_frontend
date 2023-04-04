@@ -125,11 +125,11 @@ const EmployeeSplitLandCase = () => {
                 </div>
             </div>
 
-            <div>
+            {/* <div>
                 <pre>
                     {JSON.stringify(data, null, 2)}
                 </pre>
-            </div>
+            </div> */}
 
             {verifed &&
                 <div>

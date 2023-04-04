@@ -52,7 +52,7 @@ const EmployeeNewLandRegistration = () => {
                     <h2 className="text-center underline underline-offset-4 text-primary  m-2">
                         New Property Registration
                     </h2>
-                    <pre>{JSON.stringify(property, null, 2)}</pre>
+                    {/* <pre>{JSON.stringify(property, null, 2)}</pre> */}
                 </div>
 
                 <PropertyUserForm

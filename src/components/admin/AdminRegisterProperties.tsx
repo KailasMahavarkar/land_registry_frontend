@@ -115,10 +115,16 @@ const AdminRegisterProperties = () => {
 
             const landId = block['events']['sendPropertyId']['returnValues']['_id'];
 
-            console.log({
-                _id: (targetProperty as any)._id,
-                propertyId: landId,
+
+            customToast({
+                message: `Registered Token Id is ${landId}`,
+                icon: "success"
             })
+
+            // console.log({
+            //     _id: (targetProperty as any)._id,
+            //     propertyId: landId,
+            // })
 
             axios.patch("/property/register", {
                 _id: (targetProperty as any)._id,
