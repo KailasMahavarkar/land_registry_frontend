@@ -10,7 +10,7 @@ import { useSelector } from "react-redux";
 const EmployeeDashboard = () => {
     const [active, setActive] = useState("New Registration");
     const reduxData = useSelector(state => state);
-    const permissions = (reduxData as any).permissions;
+    const permissions = (reduxData as any)?.permissions;
 
     const permissionLessNav = [
         {
@@ -75,7 +75,7 @@ const EmployeeDashboard = () => {
                         return (
                             <>
 
-                                {permissions[item.keyname] && (
+                                {permissions?.[item.keyname] && (
                                     <button
                                         key={item.keyname}
                                         onClick={() => setActive(item.name)}

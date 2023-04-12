@@ -109,6 +109,8 @@ const AdminRegisterProperties = () => {
         }
         console.log("property", property)
 
+        console.log("values", Object.values(property))
+
         try {
             const block = await drizzle.contracts.LandRegistry.methods
                 .registerNewProperty(Object.values(property)).send();

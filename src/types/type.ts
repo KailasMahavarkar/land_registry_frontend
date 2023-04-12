@@ -126,7 +126,7 @@ export type complexBlockChainType = {
     createAt: number;
 };
 
-export type employeeRoleType = "employee" | "admin" | "scrutiny" | "support";
+export type employeeRoleType = "employee" | "admin" | "scrutiny" | "support" | "unknown";
 export type employeeStatus = "active" | "inactive" | "banned" | "deleted";
 export type employeePermissionType =
     | "split"

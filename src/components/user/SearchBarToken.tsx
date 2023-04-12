@@ -3,10 +3,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { simpleChain } from "../../data/dummy.data";
+import useDrizzle from "../../hooks/useDrizzle";
 
 const SearchBarToken = () => {
 	const [search, setSearch] = useState(false);
 	const [token, setToken] = useState("");
+    const drizzle = useDrizzle();
 
 	const navigate = useNavigate();
 
@@ -26,8 +28,10 @@ const SearchBarToken = () => {
 		}
 	};
 
+    // drizzle.getProperty();
+
 	return (
-		<div className="flex flex-col w-full h-full items-center justify-center prose max-w-none">
+		<div className="flex flex-col  min-h-[100vh] items-center justify-center prose max-w-none test ">
 			<div className="flex child:m-2">
 				<h1>Search Land by Token</h1>
 				<FontAwesomeIcon icon={faSearch} size="2x" />

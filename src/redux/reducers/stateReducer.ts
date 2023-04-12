@@ -7,7 +7,7 @@ const defaultProfile: profileType = {
 	username: "",
 	fullname: "",
 	email: "",
-	role: "employee",
+	role: "unknown",
 	apikey: "",
 	datejoined: "",
 	status: "active",

@@ -29,6 +29,7 @@ import Error from "./pages/Error";
 import TestPage from "./pages/TestPage";
 const { AccountData, ContractData } = newContextComponents;
 import { drizzleOptions, drizzleStore } from "./middleware/drizzleMw";
+import Navbar from "./components/Navbar";
 
 const { store, persistor } = configureStore();
 const drizzle = new Drizzle(drizzleOptions, drizzleStore);
@@ -95,6 +96,7 @@ function App() {
                                                 initialized,
                                             }}
                                         >
+                                            <Navbar />
                                             <Routes>
                                                 <Route index element={<Home />} />
                                                 <Route
