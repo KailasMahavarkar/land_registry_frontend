@@ -115,6 +115,7 @@ const AdminUserManagement = () => {
                 transfer: false,
                 split: false,
                 merge: false,
+                register: false
             },
         }
 
@@ -239,6 +240,7 @@ const AdminUserManagement = () => {
                                 "transfer" as employeePermissionType,
                                 "split" as employeePermissionType,
                                 "merge" as employeePermissionType,
+                                "register" as employeePermissionType
                             ].map((permission: employeePermissionType) => {
                                 return (
                                     <label className="label cursor-pointer">

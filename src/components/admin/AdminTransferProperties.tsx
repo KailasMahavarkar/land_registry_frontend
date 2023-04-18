@@ -85,10 +85,6 @@ const AdminTransferProperties = () => {
                 timer: 10000
             })
 
-            // console.log({
-            //     _id: (targetProperty as any)._id,
-            //     propertyId: landId,
-            // })
 
             axios
                 .patch("/property/transfer", {

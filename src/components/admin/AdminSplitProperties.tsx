@@ -88,7 +88,7 @@ const AdminSplitProperties = () => {
         }
 
         try {
-            const result = await drizzle.contracts.LandRegistry.methods
+            await drizzle.contracts.LandRegistry.methods
                 .splitProperty(Object.values(struct))
                 .send();
 
@@ -103,7 +103,6 @@ const AdminSplitProperties = () => {
             });
 
             setProperties(newProperties);
-
 
         } catch (error) {
 

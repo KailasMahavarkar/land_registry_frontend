@@ -3,7 +3,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import produce from "immer";
 import { useContext, useState } from "react";
 import CustomContext from "../../context/custom.context";
-import defaultUsers from "../../data/users.data";
 import customToast from "../../toast";
 import { employeePermissionType } from "../../types/type";
 

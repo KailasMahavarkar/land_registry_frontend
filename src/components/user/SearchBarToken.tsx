@@ -31,7 +31,7 @@ const SearchBarToken = () => {
     // drizzle.getProperty();
 
 	return (
-		<div className="flex flex-col  min-h-[100vh] items-center justify-center prose max-w-none test ">
+		<div className="flex flex-col  min-h-[100vh] items-center justify-center prose max-w-none ">
 			<div className="flex child:m-2">
 				<h1>Search Land by Token</h1>
 				<FontAwesomeIcon icon={faSearch} size="2x" />

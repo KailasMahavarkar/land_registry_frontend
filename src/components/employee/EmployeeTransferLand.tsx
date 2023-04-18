@@ -152,7 +152,7 @@ const EmployeeTranferLand = () => {
                                 </div>
                             </div>
 
-                            {/* House & Street  */}
+                            {/* pan  */}
                             <div className="flex justify-around w-full">
                                 <div className="form-control w-full max-w-xs">
                                     <label className="label">

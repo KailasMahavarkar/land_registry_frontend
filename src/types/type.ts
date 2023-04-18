@@ -132,6 +132,7 @@ export type employeePermissionType =
     | "split"
     | "merge"
     | "transfer"
+    | "register"
 
 export type profileType = {
     _id: string;

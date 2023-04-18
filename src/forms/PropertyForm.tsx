@@ -17,7 +17,7 @@ const PropertyForm = ({
                 <div className="flex justify-around w-full">
                     <div className="form-control w-full max-w-xs">
                         <label className="label">
-                            <span className="label-text">House Number</span>
+                            <span className="label-text">Land Number</span>
                         </label>
                         <input
                             type="text"
