@@ -96,6 +96,14 @@ const AdminMergeProperties = () => {
                 .mergeProperties(Object.values(property))
                 .send();
 
+            const landId = result['events']['sendPropertyId']['returnValues']['_id'];
+
+            customToast({
+                message: `Transaction successful, New Token Id is ${landId}`,
+                icon: "success",
+                timer: 10000
+            })
+
             if (!result) {
                 return customToast({
                     message: "Transaction failed",
@@ -112,7 +120,6 @@ const AdminMergeProperties = () => {
                 });
                 setProperties(newProperties);
             })
-
 
         } catch (error: any) {
             console.log("error", error)
@@ -214,7 +221,6 @@ const AdminMergeProperties = () => {
                                                 >
                                                     Approve
                                                 </button>
-
                                             </td>
                                         </tr>
 
@@ -222,9 +228,7 @@ const AdminMergeProperties = () => {
                                             expanded.index === index && (
                                                 <pre>
                                                     {treeify.asTree(
-                                                        properties[
-                                                        expanded.index
-                                                        ] as any,
+                                                        properties[expanded.index] as any,
                                                         true,
                                                         true
                                                     )}

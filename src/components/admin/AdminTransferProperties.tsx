@@ -63,8 +63,12 @@ const AdminTransferProperties = () => {
             });
         }
 
+        // console.log("targetProperty -->", targetProperty);
+
 
         try {
+
+            const docs = targetProperty.documents.map((x) => Object.values(x).slice(0, 5));
 
             const block = await drizzle.contracts.LandRegistry.methods
                 .transferOwnership(
@@ -72,10 +76,15 @@ const AdminTransferProperties = () => {
                     targetProperty.newOwnerName,
                     targetProperty.newOwnerAadhaarCardNumber,
                     targetProperty.newOwnerPanCardNumber,
-                    []
+                    docs
                 )
                 .send();
 
+            // console.log(JSON.stringify([[targetProperty.propertyId],
+            // targetProperty.newOwnerName,
+            // targetProperty.newOwnerAadhaarCardNumber,
+            // targetProperty.newOwnerPanCardNumber,
+            //     docs], null, 2))
 
             const landId = block['events']['sendPropertyId']['returnValues']['_id'];
 
@@ -111,6 +120,9 @@ const AdminTransferProperties = () => {
             const response = await axios.get(
                 "/property/transfer?status=pending"
             );
+
+            console.log("response -->", response.data?.data);
+
             setProperties(response.data?.data);
         } catch (error: any) {
             return customToast({

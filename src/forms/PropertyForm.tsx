@@ -62,8 +62,10 @@ const PropertyForm = ({
                         </label>
                         <select
                             required={true}
+                            //   defaultValue={states[0]}  
                             value={property.propertyState}
                             onChange={(e) => {
+
                                 setProperty({
                                     ...property,
                                     propertyState: e.target.value,
@@ -71,7 +73,7 @@ const PropertyForm = ({
                             }}
                             className="select  select-bordered w-full max-w-xs"
                         >
-                            {states.map((state) => (
+                            {["", ...states].map((state) => (
                                 <option key={state}>{state}</option>
                             ))}
                         </select>

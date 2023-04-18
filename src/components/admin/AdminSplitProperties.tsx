@@ -88,15 +88,26 @@ const AdminSplitProperties = () => {
         }
 
         try {
-            await drizzle.contracts.LandRegistry.methods
+            const block = await drizzle.contracts.LandRegistry.methods
                 .splitProperty(Object.values(struct))
                 .send();
 
+            // console.log("block -->", block);
+            const landIds = block?.events?.sendPropertyId?.map((x: any) => {
+                return x?.returnValues?._id
+            })
+
+            customToast(({
+                message: `generated land ids are ${landIds?.join(", ")}`,
+                icon: "success",
+                timer: 10000
+            }))
 
             await axios.patch("/property/split", {
                 propertyId: propertyId,
                 status: status,
             })
+
 
             const newProperties = properties.filter((property, index) => {
                 return propertyId !== property.propertyId;
@@ -176,17 +187,6 @@ const AdminSplitProperties = () => {
                                                 >
                                                     Approve
                                                 </button>
-                                                {/* <button
-													className="btn btn-sm btn-error mx-2"
-													onClick={() =>
-														splitHandler(
-															property.propertyId,
-															"reject"
-														)
-													}
-												>
-													Reject
-												</button> */}
                                             </td>
                                         </tr>
 

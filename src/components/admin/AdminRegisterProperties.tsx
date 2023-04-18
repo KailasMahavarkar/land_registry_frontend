@@ -107,13 +107,16 @@ const AdminRegisterProperties = () => {
                 };
             })
         }
-        console.log("property", property)
+
 
         console.log("values", Object.values(property))
 
         try {
             const block = await drizzle.contracts.LandRegistry.methods
                 .registerNewProperty(Object.values(property)).send();
+
+            console.log(block);
+            console.log("event log -->", block.events);
 
             const landId = block['events']['sendPropertyId']['returnValues']['_id'];
 
@@ -137,9 +140,7 @@ const AdminRegisterProperties = () => {
                     return property.propertyId !== targetProperty.propertyId;
                 });
                 setProperties(newProperties);
-
             })
-
 
         } catch (error: any) {
             console.log("error", error)

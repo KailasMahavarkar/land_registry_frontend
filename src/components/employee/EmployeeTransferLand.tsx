@@ -35,7 +35,7 @@ const EmployeeTranferLand = () => {
 
     const formSubmitHandler = async () => {
         try {
-            const result = await axios.post("/property/transfer", {
+            await axios.post("/property/transfer", {
                 propertyId: landToken,
                 newOwnerName: newOwnerDetails.newOwnerName,
                 newOwnerAadhaarCardNumber: newOwnerDetails.newOwnerAadhaarCardNumber,
