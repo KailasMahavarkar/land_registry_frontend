@@ -29,6 +29,43 @@ const useDrizzle = () => {
         }
     }
 
+
+    async function getTree(landToken: number) {
+        const landTokenData = await getProperty(landToken);
+        const transferHistory = landTokenData.transferHistory;
+
+        // Base case: the land token has not been transferred yet
+        if (transferHistory.length === 0) {
+            return {
+                name: "Land Token",
+                children: []
+            }
+        }
+
+        // Recursive case: the land token has been transferred at least once
+        const root = {
+            name: `Land Token (${landToken})`,
+            children: []
+        }
+
+        for (let i = 0; i < transferedFrom.length; i++) {
+            const transfer = transferedFrom[i];
+            const transferNode = {
+                name: `${transfer.transferedFrom} → ${transfer.transferedTo}`,
+                children: []
+            }
+
+            // Recursively add the transfer history of the transferred land token as a child node
+            const childTree: any = await getTree(transfer.transferedTo);
+            transferNode.children.push(childTree);
+
+            root.children.push(transferNode);
+        }
+
+        return root;
+    }
+
+
     const getLandCount = async () => {
         try {
             const landTokenCount = await drizzleMethods.getRegisteredLandCount().call();
@@ -42,7 +79,8 @@ const useDrizzle = () => {
     return {
         validateLandToken,
         getLandCount,
-        getProperty
+        getProperty,
+        getTree
     }
 }
 

@@ -12,7 +12,7 @@ const customToast = (toast: toastType): void => {
 		toast: true,
 		position: toast.position || "top-right",
 		showConfirmButton: false,
-		timer: toast.timer || 3000,
+		timer: toast.timer || 8000,
 		timerProgressBar: true,
 		didOpen: (toast) => {
 			toast.addEventListener("mouseenter", Swal.stopTimer);

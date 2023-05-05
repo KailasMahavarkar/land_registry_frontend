@@ -1,4 +1,3 @@
-import { type } from "os";
 import { RawNodeDatum } from "react-d3-tree/lib/types/common";
 
 export type geoLocationType = {

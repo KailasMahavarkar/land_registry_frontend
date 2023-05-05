@@ -182,7 +182,7 @@ const EmployeeSplitLandCase = () => {
                                                             type="text"
                                                             placeholder="Type here"
                                                             className="input input-bordered w-full max-w-xs"
-                                                            value={data[index].ownerName}
+                                                            value={data[index]?.ownerName}
                                                             onChange={(e: any) => {
                                                                 setData(
                                                                     produce(data, (draft) => {
@@ -206,7 +206,7 @@ const EmployeeSplitLandCase = () => {
                                                             type="text"
                                                             placeholder="Type here"
                                                             className="input input-bordered w-full max-w-xs"
-                                                            value={data[index].ownerAadhaarCardNumber}
+                                                            value={data[index]?.ownerAadhaarCardNumber}
                                                             onChange={(e: any) => {
                                                                 setData(
                                                                     produce(data, (draft) => {
@@ -229,7 +229,7 @@ const EmployeeSplitLandCase = () => {
                                                         <input
                                                             type="text"
                                                             className="input input-bordered w-full max-w-xs"
-                                                            value={data[index].ownerPanCardNumber}
+                                                            value={data[index]?.ownerPanCardNumber}
                                                             onChange={(e: any) => {
                                                                 setData(
                                                                     produce(data, (draft) => {
@@ -248,7 +248,7 @@ const EmployeeSplitLandCase = () => {
                                                         <input
                                                             type="number"
                                                             className="input input-bordered w-full max-w-xs"
-                                                            value={data[index].propertyLength}
+                                                            value={data[index]?.propertyLength}
                                                             onChange={(e: any) => {
                                                                 setData(
                                                                     produce(data, (draft) => {
@@ -271,7 +271,7 @@ const EmployeeSplitLandCase = () => {
                                                         <input
                                                             type="number"
                                                             className="input input-bordered w-full max-w-xs"
-                                                            value={data[index].propertyWidth}
+                                                            value={data[index]?.propertyWidth}
                                                             onChange={(e: any) => {
                                                                 setData(
                                                                     produce(data, (draft) => {
@@ -290,7 +290,7 @@ const EmployeeSplitLandCase = () => {
                                                         <input
                                                             type="number"
                                                             className="input input-bordered w-full max-w-xs"
-                                                            value={data[index].surveyNumber}
+                                                            value={data[index]?.surveyNumber}
                                                             onChange={(e: any) => {
                                                                 setData(
                                                                     produce(data, (draft) => {
@@ -313,7 +313,7 @@ const EmployeeSplitLandCase = () => {
                                                         <input
                                                             type="number"
                                                             className="input input-bordered w-full max-w-xs"
-                                                            value={data[index].subSurveyNumber}
+                                                            value={data[index]?.subSurveyNumber}
                                                             onChange={(e: any) => {
                                                                 setData(
                                                                     produce(data, (draft) => {

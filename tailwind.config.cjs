@@ -37,7 +37,7 @@ module.exports = {
 	daisyui: {
 		styled: true,
 		themes: [
-            "dark",
+            "light",
 			{
 				// light: {
 				// 	...require("daisyui/src/colors/themes")[

@@ -81,7 +81,6 @@ const Header = () => {
 						className="btn btn-outline btn-error btn-sm"
 						onClick={() => {
 							dispatch(removeLogin());
-
 							navigate("/login");
 						}}
 					>
